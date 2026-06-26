@@ -55,7 +55,10 @@ function getNextDayRange(): { start: string; end: string } {
 }
 
 export async function getNextDayTennisEvents(): Promise<TennisEvent[]> {
-  const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON!);
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON!;
+  const credentials = JSON.parse(
+    raw.startsWith("{") ? raw : Buffer.from(raw, "base64").toString("utf-8")
+  );
   const auth = new google.auth.GoogleAuth({
     credentials,
     scopes: ["https://www.googleapis.com/auth/calendar.readonly"],
