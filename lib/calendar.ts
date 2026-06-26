@@ -38,23 +38,18 @@ async function getLocationForEvent(title: string, locationField: string | null):
   return DEFAULT_LOCATION;
 }
 
-function getNextDayRange(): { start: string; end: string } {
-  const now = new Date();
-  // Convert to Israel time (UTC+3 in summer / UTC+2 in winter — use Intl to get the offset)
-  const israelNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }));
-  const tomorrow = new Date(israelNow);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
-  const tomorrowEnd = new Date(tomorrow);
-  tomorrowEnd.setHours(23, 59, 59, 999);
-
-  return {
-    start: tomorrow.toISOString(),
-    end: tomorrowEnd.toISOString(),
-  };
+function getDateRange(daysForward: number): { start: string; end: string } {
+  const israelNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }));
+  const start = new Date(israelNow);
+  start.setDate(start.getDate() + 1);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(israelNow);
+  end.setDate(end.getDate() + daysForward);
+  end.setHours(23, 59, 59, 999);
+  return { start: start.toISOString(), end: end.toISOString() };
 }
 
-export async function getNextDayTennisEvents(): Promise<TennisEvent[]> {
+async function buildCalendarClient() {
   const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON!;
   const credentials = JSON.parse(
     raw.startsWith("{") ? raw : Buffer.from(raw, "base64").toString("utf-8")
@@ -63,9 +58,16 @@ export async function getNextDayTennisEvents(): Promise<TennisEvent[]> {
     credentials,
     scopes: ["https://www.googleapis.com/auth/calendar.readonly"],
   });
+  return google.calendar({ version: "v3", auth });
+}
 
-  const calendar = google.calendar({ version: "v3", auth });
-  const { start, end } = getNextDayRange();
+export async function getNextDayTennisEvents(): Promise<TennisEvent[]> {
+  return getTennisEvents(1);
+}
+
+export async function getTennisEvents(daysForward = 1): Promise<TennisEvent[]> {
+  const calendar = await buildCalendarClient();
+  const { start, end } = getDateRange(daysForward);
 
   const response = await calendar.events.list({
     calendarId: process.env.GOOGLE_CALENDAR_ID!,
