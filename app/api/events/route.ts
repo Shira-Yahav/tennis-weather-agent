@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { getTennisEvents } from "@/lib/calendar";
 import { getWeatherForEvent } from "@/lib/weather";
-import { getConfig } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const config = await getConfig();
-    const events = await getTennisEvents(config.daysForward);
+    const { searchParams } = new URL(request.url);
+    const days = Math.min(Math.max(parseInt(searchParams.get("days") ?? "7"), 1), 30);
+    const events = await getTennisEvents(days);
 
     const withWeather = await Promise.all(
       events.map(async (event) => {

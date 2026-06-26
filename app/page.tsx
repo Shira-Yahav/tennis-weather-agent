@@ -26,7 +26,26 @@ interface LogEntry {
   events: Array<{ title: string; startTime: string; location: string; weather: EventWeather }>;
   message: string;
 }
-interface AppConfig { daysForward: number; messagePrefix: string; messageSuffix: string }
+interface MessageTemplate { header: string; eventBlock: string; footerGood: string; footerBad: string }
+interface AppConfig { daysForward: number; scheduleHour: number; template: MessageTemplate }
+
+const DEFAULT_TEMPLATE: MessageTemplate = {
+  header: "🎾 <b>Tennis — {date}</b>",
+  eventBlock: "<b>{title}</b>\n🕐 {time}\n📍 {venue}\n🌡 {temp}°C  🌧 Rain: {rain}%  💨 Wind: {wind} km/h\n{condition}",
+  footerGood: "All clear — enjoy your game! 🎾",
+  footerBad: "⚠️ <b>Weather is not ideal. Consider cancelling or rescheduling.</b>",
+};
+
+const TEMPLATE_VARS = [
+  { key: "{date}", desc: "Event date" },
+  { key: "{title}", desc: "Event title" },
+  { key: "{time}", desc: "Start–end time" },
+  { key: "{venue}", desc: "Venue name" },
+  { key: "{temp}", desc: "Temperature °C" },
+  { key: "{rain}", desc: "Rain probability %" },
+  { key: "{wind}", desc: "Wind speed km/h" },
+  { key: "{condition}", desc: "✅ Good / ⚠️ Bad" },
+];
 
 function fmtDate(iso: string) {
   const d = new Date(iso);
@@ -92,7 +111,7 @@ export default function Dashboard() {
   const [events, setEvents] = useState<TennisEvent[]>([]);
   const [selected, setSelected] = useState<TennisEvent | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [config, setConfig] = useState<AppConfig>({ daysForward: 7, messagePrefix: "", messageSuffix: "" });
+  const [config, setConfig] = useState<AppConfig>({ daysForward: 7, scheduleHour: 16, template: DEFAULT_TEMPLATE });
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
@@ -101,15 +120,17 @@ export default function Dashboard() {
 
   const showToast = (message: string, ok = true) => setToast({ open: true, message, ok });
 
-  const loadEvents = useCallback(async () => {
+  const loadEvents = useCallback(async (days?: number) => {
     try {
-      const res = await fetch("/api/events");
+      const d = days ?? config.daysForward;
+      const res = await fetch(`/api/events?days=${d}`);
       if (!res.ok) throw new Error("Failed");
       setEvents(await res.json());
       setLastRefresh(new Date());
     } catch { showToast("Failed to refresh events", false); }
     finally { setLoading(false); }
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.daysForward]);
 
   const loadLogs = useCallback(async () => {
     try { const r = await fetch("/api/logs"); const d = await r.json(); setLogs(Array.isArray(d) ? d : []); } catch {}
@@ -142,7 +163,7 @@ export default function Dashboard() {
     setConfig(next);
     try {
       await fetch("/api/config", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(next) });
-      if ("daysForward" in updates) { setLoading(true); await loadEvents(); }
+      if ("daysForward" in updates) { setLoading(true); await loadEvents(updates.daysForward); }
     } catch { showToast("Failed to save settings", false); }
   };
 
@@ -166,7 +187,7 @@ export default function Dashboard() {
                 Live · {lastRefresh.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
               </span>
             )}
-            <button onClick={loadEvents} className="p-2 rounded-lg bg-green-700 hover:bg-green-600 transition-colors" title="Refresh">
+            <button onClick={() => loadEvents()} className="p-2 rounded-lg bg-green-700 hover:bg-green-600 transition-colors" title="Refresh">
               <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
             </button>
             <button
@@ -324,37 +345,53 @@ export default function Dashboard() {
                 </Tabs.Content>
 
                 <Tabs.Content value="template" className="flex-1 overflow-auto p-4">
-                  <div className="flex gap-4 h-full">
-                    <div className="flex-1">
-                      <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-1.5">Opening line</label>
-                      <textarea rows={2} value={config.messagePrefix}
-                        onChange={(e) => saveConfig({ messagePrefix: e.target.value })}
-                        placeholder="e.g. Hey! Here's your tennis forecast 🎾"
-                        className="w-full rounded-lg border border-[#C5DDB8] p-2.5 text-xs text-[#1A2B1A] bg-[#F8FCF5] focus:outline-none focus:ring-2 focus:ring-[#1B6B2C] resize-none"
-                      />
+                  <div className="flex gap-4 h-full min-h-0">
+                    {/* Left: editable fields */}
+                    <div className="flex-1 space-y-2 overflow-auto">
+                      {(["header", "eventBlock", "footerGood", "footerBad"] as const).map((field) => {
+                        const labels: Record<string, string> = {
+                          header: "Header (shown once, supports {date})",
+                          eventBlock: "Per-event block (repeated for each event)",
+                          footerGood: "Footer — good weather",
+                          footerBad: "Footer — bad weather",
+                        };
+                        return (
+                          <div key={field}>
+                            <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-1">{labels[field]}</label>
+                            <textarea
+                              rows={field === "eventBlock" ? 5 : 2}
+                              value={config.template[field]}
+                              onChange={(e) => saveConfig({ template: { ...config.template, [field]: e.target.value } })}
+                              className="w-full rounded-lg border border-[#C5DDB8] p-2 text-xs font-mono text-[#1A2B1A] bg-[#F8FCF5] focus:outline-none focus:ring-2 focus:ring-[#1B6B2C] resize-none"
+                            />
+                          </div>
+                        );
+                      })}
+                      <button
+                        onClick={() => saveConfig({ template: DEFAULT_TEMPLATE })}
+                        className="text-[10px] text-[#5C7A5C] underline hover:text-[#1B6B2C]"
+                      >
+                        Reset to default
+                      </button>
                     </div>
-                    <div className="flex-1">
-                      <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-1.5">Closing line</label>
-                      <textarea rows={2} value={config.messageSuffix}
-                        onChange={(e) => saveConfig({ messageSuffix: e.target.value })}
-                        placeholder="e.g. Court reserved under: Shira Y."
-                        className="w-full rounded-lg border border-[#C5DDB8] p-2.5 text-xs text-[#1A2B1A] bg-[#F8FCF5] focus:outline-none focus:ring-2 focus:ring-[#1B6B2C] resize-none"
-                      />
-                    </div>
-                    <div className="flex-1 bg-[#F0F7EC] rounded-xl border border-[#C5DDB8] p-3 text-[10px] text-[#5C7A5C]">
-                      <p className="font-bold text-[#1B6B2C] mb-1.5">Preview structure</p>
-                      {config.messagePrefix && <p className="text-[#1A2B1A] italic mb-1">"{config.messagePrefix}"</p>}
-                      <p>🎾 <strong>Tennis [date]</strong></p>
-                      <p>Event · time · venue · temp · rain · wind · status</p>
-                      {config.messageSuffix && <p className="text-[#1A2B1A] italic mt-1">"{config.messageSuffix}"</p>}
+                    {/* Right: variable reference */}
+                    <div className="w-52 flex-shrink-0 bg-[#F0F7EC] rounded-xl border border-[#C5DDB8] p-3 self-start">
+                      <p className="text-[10px] font-bold text-[#1B6B2C] uppercase tracking-wider mb-2">Available variables</p>
+                      {TEMPLATE_VARS.map(({ key, desc }) => (
+                        <div key={key} className="flex items-start gap-1.5 mb-1.5">
+                          <code className="text-[10px] bg-white border border-[#C5DDB8] px-1.5 py-0.5 rounded font-mono text-[#1B6B2C] flex-shrink-0">{key}</code>
+                          <span className="text-[10px] text-[#5C7A5C] leading-tight">{desc}</span>
+                        </div>
+                      ))}
+                      <p className="text-[10px] text-[#5C7A5C] mt-2">Use <code className="bg-white border border-[#C5DDB8] px-1 rounded">&lt;b&gt;&lt;/b&gt;</code> for bold in Telegram.</p>
                     </div>
                   </div>
                 </Tabs.Content>
 
                 <Tabs.Content value="schedule" className="flex-1 overflow-auto p-4">
-                  <div className="flex gap-6">
+                  <div className="flex gap-8">
                     <div className="flex-1">
-                      <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-2">Days forward to check</label>
+                      <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-2">Days forward (dashboard & Run Now)</label>
                       <div className="flex items-center gap-3">
                         <Slider.Root min={1} max={14} step={1} value={[config.daysForward]}
                           onValueChange={([v]) => saveConfig({ daysForward: v })}
@@ -366,18 +403,24 @@ export default function Dashboard() {
                         </Slider.Root>
                         <span className="text-xl font-bold text-[#1B6B2C] w-7 text-center">{config.daysForward}</span>
                       </div>
-                      <p className="text-[10px] text-[#5C7A5C] mt-1.5">Affects dashboard & Run Now. The daily cron always checks tomorrow only.</p>
+                      <p className="text-[10px] text-[#5C7A5C] mt-1.5">The daily scheduled run always checks only tomorrow.</p>
                     </div>
-                    <div className="flex-shrink-0">
-                      <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-2">Scheduled daily run</label>
-                      <div className="flex items-center gap-2 bg-[#F0F7EC] border border-[#C5DDB8] rounded-xl px-3 py-2.5">
-                        <Clock size={15} className="text-[#1B6B2C]" />
-                        <div>
-                          <p className="text-sm font-bold text-[#1A2B1A]">16:00 Israel time</p>
-                          <p className="text-[10px] text-[#5C7A5C]">Every day · checks tomorrow</p>
-                        </div>
+                    <div className="flex-1">
+                      <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-2">
+                        Daily send time (Israel time) — currently <span className="text-[#1B6B2C]">{config.scheduleHour}:00</span>
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <Slider.Root min={6} max={22} step={1} value={[config.scheduleHour]}
+                          onValueChange={([v]) => saveConfig({ scheduleHour: v })}
+                          className="relative flex items-center select-none touch-none w-full h-5">
+                          <Slider.Track className="bg-[#C5DDB8] relative grow rounded-full h-2">
+                            <Slider.Range className="absolute bg-[#1B6B2C] rounded-full h-full" />
+                          </Slider.Track>
+                          <Slider.Thumb className="block w-5 h-5 bg-white border-2 border-[#1B6B2C] shadow-md rounded-full focus:outline-none focus:ring-2 focus:ring-[#1B6B2C]" />
+                        </Slider.Root>
+                        <span className="text-sm font-bold text-[#1B6B2C] w-14 text-center">{config.scheduleHour}:00</span>
                       </div>
-                      <p className="text-[10px] text-[#5C7A5C] mt-1.5">To change: update <code className="bg-[#E0EDD8] px-1 rounded">vercel.ts</code> and redeploy.</p>
+                      <p className="text-[10px] text-[#5C7A5C] mt-1.5">The agent checks every hour. It only sends at the configured time.</p>
                     </div>
                   </div>
                 </Tabs.Content>

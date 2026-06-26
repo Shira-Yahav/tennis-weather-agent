@@ -1,18 +1,15 @@
-import { put, list } from "@vercel/blob";
-
-const CONFIG_PATH = "tennis-agent/config.json";
-const LOGS_PATH = "tennis-agent/logs.json";
+import { DEFAULT_TEMPLATE, type MessageTemplate } from "./formatter";
 
 export interface AppConfig {
   daysForward: number;
-  messagePrefix: string;
-  messageSuffix: string;
+  scheduleHour: number;
+  template: MessageTemplate;
 }
 
 export const DEFAULT_CONFIG: AppConfig = {
   daysForward: 7,
-  messagePrefix: "",
-  messageSuffix: "",
+  scheduleHour: 16,
+  template: DEFAULT_TEMPLATE,
 };
 
 export interface LogEntry {
@@ -29,43 +26,40 @@ export interface LogEntry {
   message: string;
 }
 
-const hasBlob = () => !!process.env.BLOB_READ_WRITE_TOKEN;
-
-async function readBlob<T>(path: string, fallback: T): Promise<T> {
-  if (!hasBlob()) return fallback;
-  try {
-    const { blobs } = await list({ prefix: path });
-    if (!blobs.length) return fallback;
-    const res = await fetch(blobs[0].url, { cache: "no-store" });
-    return await res.json();
-  } catch {
-    return fallback;
-  }
-}
-
-async function writeBlob(path: string, data: unknown): Promise<void> {
-  if (!hasBlob()) return;
-  await put(path, JSON.stringify(data), {
-    access: "public",
-    contentType: "application/json",
-    addRandomSuffix: false,
-  });
+function getRedis() {
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) return null;
+  const { Redis } = require("@upstash/redis");
+  return Redis.fromEnv() as import("@upstash/redis").Redis;
 }
 
 export async function getConfig(): Promise<AppConfig> {
-  return readBlob(CONFIG_PATH, DEFAULT_CONFIG);
+  const redis = getRedis();
+  if (!redis) return DEFAULT_CONFIG;
+  try {
+    const stored = await redis.get<AppConfig>("tennis:config");
+    if (!stored) return DEFAULT_CONFIG;
+    return { ...DEFAULT_CONFIG, ...stored, template: { ...DEFAULT_CONFIG.template, ...(stored.template ?? {}) } };
+  } catch { return DEFAULT_CONFIG; }
 }
 
 export async function saveConfig(config: AppConfig): Promise<void> {
-  await writeBlob(CONFIG_PATH, config);
+  const redis = getRedis();
+  if (!redis) return;
+  await redis.set("tennis:config", config);
 }
 
 export async function getLogs(): Promise<LogEntry[]> {
-  return readBlob(LOGS_PATH, []);
+  const redis = getRedis();
+  if (!redis) return [];
+  try {
+    const logs = await redis.lrange<LogEntry>("tennis:logs", 0, 99);
+    return logs ?? [];
+  } catch { return []; }
 }
 
 export async function appendLog(entry: LogEntry): Promise<void> {
-  const logs = await getLogs();
-  logs.unshift(entry);
-  await writeBlob(LOGS_PATH, logs.slice(0, 100));
+  const redis = getRedis();
+  if (!redis) return;
+  await redis.lpush("tennis:logs", entry);
+  await redis.ltrim("tennis:logs", 0, 99);
 }

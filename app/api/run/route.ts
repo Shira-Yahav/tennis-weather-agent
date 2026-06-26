@@ -23,9 +23,7 @@ export async function POST() {
       }))
     );
 
-    let message = formatMessage(items);
-    if (config.messagePrefix) message = `${config.messagePrefix}\n\n${message}`;
-    if (config.messageSuffix) message = `${message}\n\n${config.messageSuffix}`;
+    const message = formatMessage(items, config.template);
 
     await sendTelegramMessage(message);
 

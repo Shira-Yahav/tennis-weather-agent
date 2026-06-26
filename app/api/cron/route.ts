@@ -28,9 +28,12 @@ export async function GET(request: Request) {
     }))
   );
 
-  let message = formatMessage(items);
-  if (config.messagePrefix) message = `${config.messagePrefix}\n\n${message}`;
-  if (config.messageSuffix) message = `${message}\n\n${config.messageSuffix}`;
+  const israelHour = new Date().toLocaleString("en-US", { timeZone: "Asia/Jerusalem", hour: "numeric", hour12: false });
+  if (parseInt(israelHour) !== config.scheduleHour) {
+    return NextResponse.json({ message: `Not send time yet (configured: ${config.scheduleHour}:00 IL)` });
+  }
+
+  const message = formatMessage(items, config.template);
 
   await sendTelegramMessage(message);
 
