@@ -7,7 +7,7 @@ export interface EventWithWeather {
 }
 
 function formatTime(date: Date): string {
-  return date.toLocaleTimeString("he-IL", {
+  return date.toLocaleTimeString("en-GB", {
     timeZone: "Asia/Jerusalem",
     hour: "2-digit",
     minute: "2-digit",
@@ -15,11 +15,12 @@ function formatTime(date: Date): string {
 }
 
 function formatDate(date: Date): string {
-  return date.toLocaleDateString("he-IL", {
+  return date.toLocaleDateString("en-GB", {
     timeZone: "Asia/Jerusalem",
     weekday: "long",
     day: "numeric",
     month: "long",
+    year: "numeric",
   });
 }
 
@@ -36,7 +37,7 @@ export function formatMessage(items: EventWithWeather[]): string {
     lines.push(`<b>${event.title}</b>`);
     lines.push(`🕐 ${time}`);
     lines.push(`📍 ${event.location.label}`);
-    lines.push(`🌧 Rain: ${weather.rainProbability}%  💨 Wind: ${weather.windSpeed} km/h`);
+    lines.push(`🌡 Temp: ${weather.temperature}°C  🌧 Rain: ${weather.rainProbability}%  💨 Wind: ${weather.windSpeed} km/h`);
     lines.push(weatherStatus);
     lines.push("");
   }

@@ -3,6 +3,7 @@ import type { LatLng } from "./locations";
 export interface WeatherConditions {
   rainProbability: number; // percent
   windSpeed: number;       // km/h
+  temperature: number;     // °C
   isBad: boolean;
 }
 
@@ -11,7 +12,7 @@ export async function getWeatherForEvent(location: LatLng, eventTime: Date): Pro
   const url = new URL("https://api.open-meteo.com/v1/forecast");
   url.searchParams.set("latitude", location.lat.toString());
   url.searchParams.set("longitude", location.lng.toString());
-  url.searchParams.set("hourly", "precipitation_probability,windspeed_10m");
+  url.searchParams.set("hourly", "precipitation_probability,windspeed_10m,temperature_2m");
   url.searchParams.set("start_date", date);
   url.searchParams.set("end_date", date);
   url.searchParams.set("timezone", "Asia/Jerusalem");
@@ -23,6 +24,7 @@ export async function getWeatherForEvent(location: LatLng, eventTime: Date): Pro
   const hours: string[] = data.hourly.time;
   const rainProbs: number[] = data.hourly.precipitation_probability;
   const windSpeeds: number[] = data.hourly.windspeed_10m;
+  const temperatures: number[] = data.hourly.temperature_2m;
 
   // Find the hour closest to the event start time
   const eventHour = eventTime.getHours();
@@ -31,7 +33,8 @@ export async function getWeatherForEvent(location: LatLng, eventTime: Date): Pro
 
   const rainProbability = rainProbs[safeIdx] ?? 0;
   const windSpeed = windSpeeds[safeIdx] ?? 0;
+  const temperature = temperatures[safeIdx] ?? 0;
   const isBad = windSpeed >= 20 || rainProbability >= 30;
 
-  return { rainProbability, windSpeed, isBad };
+  return { rainProbability, windSpeed, temperature, isBad };
 }
