@@ -11,10 +11,12 @@ export async function POST(request: Request) {
   const config = await getConfig();
   let selectedIndices: number[] | null = null;
 
-  try {
-    const body = await request.json().catch(() => ({}));
-    if (Array.isArray(body.selectedIndices)) selectedIndices = body.selectedIndices;
-  } catch {}
+  const body = await request.json().catch(() => ({}));
+  if (Array.isArray(body.selectedIndices)) selectedIndices = body.selectedIndices;
+  // Use template from request body if provided (client may have unsaved edits)
+  if (body.template && typeof body.template === "object") {
+    config.template = { ...config.template, ...body.template };
+  }
 
   const entry = {
     id: Date.now().toString(),

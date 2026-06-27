@@ -229,7 +229,7 @@ export default function Dashboard() {
       const res = await fetch("/api/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ selectedIndices: Array.from(checkedIndices) }),
+        body: JSON.stringify({ selectedIndices: Array.from(checkedIndices), template: config.template }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Run failed");
@@ -487,39 +487,77 @@ export default function Dashboard() {
                 </Tabs.Content>
 
                 {/* Template */}
-                <Tabs.Content value="template" className="flex-1 overflow-auto p-4">
-                  <div className="flex gap-4 h-full min-h-0">
-                    <div className="flex-1 space-y-2 overflow-auto">
-                      {(["header", "eventBlock", "footerGood", "footerBad"] as const).map((field) => {
-                        const labels: Record<string, string> = {
-                          header: "Header (shown once — supports {date})",
-                          eventBlock: "Per-event block (repeated for each event)",
-                          footerGood: "Footer — good weather",
-                          footerBad: "Footer — bad weather",
-                        };
-                        return (
-                          <div key={field}>
-                            <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-1">{labels[field]}</label>
-                            <textarea rows={field === "eventBlock" ? 5 : 2}
-                              value={config.template[field]}
-                              onChange={(e) => saveConfig({ template: { ...config.template, [field]: e.target.value } })}
-                              className="w-full rounded-lg border border-[#C5DDB8] p-2 text-xs font-mono text-[#1A2B1A] bg-[#F8FCF5] focus:outline-none focus:ring-2 focus:ring-[#1B6B2C] resize-none"
-                            />
-                          </div>
-                        );
-                      })}
-                      <button onClick={() => saveConfig({ template: DEFAULT_TEMPLATE })}
-                        className="text-[10px] text-[#5C7A5C] underline hover:text-[#1B6B2C]">Reset to default</button>
-                    </div>
-                    <div className="w-52 flex-shrink-0 bg-[#F0F7EC] rounded-xl border border-[#C5DDB8] p-3 self-start">
-                      <p className="text-[10px] font-bold text-[#1B6B2C] uppercase tracking-wider mb-2">Available variables</p>
+                <Tabs.Content value="template" className="flex-1 overflow-hidden">
+                  <div className="flex h-full">
+                    {/* Editors */}
+                    <ScrollArea.Root className="flex-1 overflow-hidden border-r border-[#E0EDD8]">
+                      <ScrollArea.Viewport className="h-full p-3 space-y-2">
+                        {(["header", "eventBlock", "footerGood", "footerBad"] as const).map((field) => {
+                          const labels: Record<string, string> = {
+                            header: "Header — {date} available",
+                            eventBlock: "Per-event block — all variables available",
+                            footerGood: "Footer — good weather",
+                            footerBad: "Footer — bad weather",
+                          };
+                          return (
+                            <div key={field}>
+                              <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-1">{labels[field]}</label>
+                              <textarea rows={field === "eventBlock" ? 4 : 2}
+                                value={config.template[field]}
+                                onChange={(e) => setConfig(c => ({ ...c, template: { ...c.template, [field]: e.target.value } }))}
+                                onBlur={(e) => saveConfig({ template: { ...config.template, [field]: e.target.value } })}
+                                className="w-full rounded-lg border border-[#C5DDB8] p-2 text-xs font-mono text-[#1A2B1A] bg-[#F8FCF5] focus:outline-none focus:ring-2 focus:ring-[#1B6B2C] resize-none"
+                              />
+                            </div>
+                          );
+                        })}
+                        <button onClick={() => saveConfig({ template: DEFAULT_TEMPLATE })}
+                          className="text-[10px] text-[#5C7A5C] underline hover:text-[#1B6B2C]">Reset to default</button>
+                      </ScrollArea.Viewport>
+                    </ScrollArea.Root>
+
+                    {/* Variables */}
+                    <div className="w-36 flex-shrink-0 border-r border-[#E0EDD8] p-2 overflow-auto bg-[#F8FCF5]">
+                      <p className="text-[9px] font-bold text-[#1B6B2C] uppercase tracking-wider mb-1.5">Variables</p>
                       {TEMPLATE_VARS.map(({ key, desc }) => (
-                        <div key={key} className="flex items-start gap-1.5 mb-1.5">
-                          <code className="text-[10px] bg-white border border-[#C5DDB8] px-1.5 py-0.5 rounded font-mono text-[#1B6B2C] flex-shrink-0">{key}</code>
-                          <span className="text-[10px] text-[#5C7A5C] leading-tight">{desc}</span>
+                        <div key={key} className="mb-1.5">
+                          <code className="text-[9px] bg-white border border-[#C5DDB8] px-1 py-0.5 rounded font-mono text-[#1B6B2C] block">{key}</code>
+                          <span className="text-[9px] text-[#5C7A5C] leading-tight">{desc}</span>
                         </div>
                       ))}
-                      <p className="text-[10px] text-[#5C7A5C] mt-2">Use <code className="bg-white border border-[#C5DDB8] px-1 rounded">&lt;b&gt;&lt;/b&gt;</code> for bold in Telegram.</p>
+                      <p className="text-[9px] text-[#5C7A5C] mt-2 border-t border-[#E0EDD8] pt-2">Use <code className="bg-white border border-[#C5DDB8] px-0.5 rounded">&lt;b&gt;</code> for bold</p>
+                    </div>
+
+                    {/* Live preview */}
+                    <div className="w-56 flex-shrink-0 p-2 overflow-auto bg-white">
+                      <p className="text-[9px] font-bold text-[#1B6B2C] uppercase tracking-wider mb-1.5">Preview {events.length === 0 && "(no events)"}</p>
+                      <pre className="text-[10px] text-[#1A2B1A] whitespace-pre-wrap font-mono leading-relaxed bg-[#F8FCF5] rounded-lg border border-[#E0EDD8] p-2">
+                        {(() => {
+                          const ev = events[0];
+                          if (!ev) return "Load calendar events to see a preview here.";
+                          const w = ev.weather;
+                          const d = new Date(ev.startTime).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+                          const t = `${fmtTime(ev.startTime)}–${fmtTime(ev.endTime)}`;
+                          const fill = (tpl: string) => tpl
+                            .replace(/{date}/g, d)
+                            .replace(/{title}/g, ev.title)
+                            .replace(/{time}/g, t)
+                            .replace(/{venue}/g, ev.location.label)
+                            .replace(/{temp}/g, w ? String(w.temp) : "–")
+                            .replace(/{rain}/g, w ? String(w.rain) : "–")
+                            .replace(/{wind}/g, w ? String(w.wind) : "–")
+                            .replace(/{condition}/g, w?.isBad ? "⚠️ Bad conditions" : "✅ Good conditions")
+                            .replace(/<b>/g, "").replace(/<\/b>/g, "");
+                          const anyBad = w?.isBad ?? false;
+                          return [
+                            fill(config.template.header),
+                            "",
+                            fill(config.template.eventBlock),
+                            "",
+                            fill(anyBad ? config.template.footerBad : config.template.footerGood),
+                          ].join("\n");
+                        })()}
+                      </pre>
                     </div>
                   </div>
                 </Tabs.Content>
