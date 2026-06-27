@@ -30,14 +30,38 @@ export function lookupKnownVenue(venueName: string): LatLng | null {
   return null;
 }
 
+function hasHebrew(str: string): boolean {
+  return /[֐-׿]/.test(str);
+}
+
+function buildEnglishLabel(result: { formatted_address: string; address_components: Array<{ long_name: string; types: string[] }> }): string {
+  // Prefer formatted_address if it's already in English
+  if (!hasHebrew(result.formatted_address)) return result.formatted_address;
+
+  // Otherwise build from address_components (returned in English with language=en)
+  const get = (...types: string[]) =>
+    result.address_components.find(c => types.some(t => c.types.includes(t)))?.long_name ?? "";
+
+  const parts = [
+    get("premise", "point_of_interest", "establishment"),
+    get("route", "neighborhood", "sublocality"),
+    get("locality", "administrative_area_level_2"),
+    get("administrative_area_level_1"),
+  ].filter(p => p && !hasHebrew(p));
+
+  return parts.length > 0 ? parts.join(", ") : "Israel";
+}
+
 export async function geocodeVenue(query: string): Promise<LatLng | null> {
   const key = process.env.GOOGLE_GEOCODING_KEY;
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&language=en&key=${key}`;
+  if (!key) return null;
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&language=en&region=il&key=${key}`;
   const res = await fetch(url, { cache: "no-store" });
   const data = await res.json();
   if (data.status !== "OK" || !data.results[0]) return null;
   const { lat, lng } = data.results[0].geometry.location;
-  return { lat, lng, label: data.results[0].formatted_address };
+  const label = buildEnglishLabel(data.results[0]);
+  return { lat, lng, label };
 }
 
 export async function resolveLocation(venueName: string): Promise<LatLng> {

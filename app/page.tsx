@@ -421,7 +421,7 @@ export default function Dashboard() {
             {selected?.weather && <WeatherPanel w={selected.weather} label={selected.location.label} startTime={selected.startTime} />}
 
             {/* Tabs */}
-            <div className="flex-shrink-0 border-t border-[#C5DDB8] bg-white" style={{ height: 270 }}>
+            <div className="flex-shrink-0 border-t border-[#C5DDB8] bg-white" style={{ height: 320 }}>
               <Tabs.Root defaultValue="logs" className="h-full flex flex-col">
                 <Tabs.List className="flex border-b border-[#E0EDD8] px-4 bg-[#F8FCF5] flex-shrink-0">
                   {[
