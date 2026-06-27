@@ -1,0 +1,13 @@
+{
+  "messageDaysForward": 1,
+  "scheduleHour": 16,
+  "scheduleMinute": 0,
+  "template": {
+    "header": "🎾 <b>Tennis — {date}</b>",
+    "eventBlock": "<b>{title}</b>\n🕐 {time}\n📍 {venue}\n🌡 {temp}°C  🌧 Rain: {rain}%  💨 Wind: {wind} km/h\n{condition}",
+    "footerGood": "All clear — enjoy your game! 🎾",
+    "footerBad": "⚠️ <b>Weather is not ideal. Consider cancelling or rescheduling.</b>"
+  },
+  "windThreshold": 2,
+  "rainThreshold": 30
+}
