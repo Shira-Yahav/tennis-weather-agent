@@ -470,105 +470,69 @@ export default function Dashboard() {
             </ScrollArea.Root>
           </div>
 
-          {/* Right: map + weather sidebar + tabs */}
+          {/* Right: map + weather strip + tabs */}
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex-1 flex overflow-hidden min-h-0">
-              {/* Map */}
-              <div className="flex-1 relative">
-                {selected || userLocation ? (
-                  <TennisMap
-                    lat={selected ? selected.location.lat : userLocation!.lat}
-                    lng={selected ? selected.location.lng : userLocation!.lng}
-                    label={selected ? selected.location.label : "Your location"}
-                    userLat={userLocation?.lat}
-                    userLng={userLocation?.lng}
-                    defaultView={!selected}
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-[#F0F7EC] text-[#5C7A5C]">
-                    <MapPin size={44} className="text-[#C5DDB8] mb-3" />
-                    <p className="font-semibold text-sm">Waiting for location…</p>
-                    <p className="text-xs mt-1 text-[#A8C99A]">Allow location access to see the map</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Weather sidebar */}
-              <div className="w-52 flex-shrink-0 border-l border-[#C5DDB8] bg-white flex flex-col overflow-hidden">
-                {(() => {
-                  const w = selected?.weather ?? currentWeather;
-                  const isLoading = !selected && loadingCurrentWeather;
-                  const label = selected ? selected.location.label : "Current location";
-                  const timeLabel = selected
-                    ? `${fmtDate(selected.startTime)} · ${fmtTime(selected.startTime)}`
-                    : `Now · ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`;
-
-                  const rainCls = (v: number) => v >= config.rainThreshold ? "text-red-600" : v >= config.rainThreshold * 0.5 ? "text-amber-600" : "text-emerald-600";
-                  const windCls = (v: number) => v >= config.windThreshold ? "text-red-600" : v >= config.windThreshold * 0.6 ? "text-amber-600" : "text-emerald-600";
-
-                  return (
-                    <>
-                      <div className="px-3 pt-3 pb-2 border-b border-[#E0EDD8] flex-shrink-0">
-                        <p className="text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider">
-                          {selected ? "Event weather" : "Current weather"}
-                        </p>
-                        <p className="text-xs font-semibold text-[#1A2B1A] mt-0.5 truncate">{label}</p>
-                        <p className="text-[10px] text-[#5C7A5C]">{timeLabel}</p>
-                      </div>
-
-                      <div className="flex-1 overflow-auto p-3 space-y-2">
-                        {isLoading ? (
-                          <div className="flex items-center justify-center h-24 text-[#5C7A5C]">
-                            <RefreshCw size={16} className="animate-spin" />
-                          </div>
-                        ) : w ? (
-                          <>
-                            {/* Status banner */}
-                            <div className={`rounded-xl px-3 py-2 flex items-center gap-2 ${w.isBad ? "bg-red-50 border border-red-200" : "bg-emerald-50 border border-emerald-200"}`}>
-                              {w.isBad
-                                ? <AlertTriangle size={14} className="text-red-600 flex-shrink-0" />
-                                : <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0" />}
-                              <span className={`text-xs font-bold ${w.isBad ? "text-red-700" : "text-emerald-700"}`}>
-                                {w.isBad ? "Poor conditions" : "Good to play!"}
-                              </span>
-                            </div>
-
-                            {/* Temperature */}
-                            <div className="flex flex-col items-center bg-orange-50 border border-orange-100 rounded-xl py-3">
-                              <Thermometer size={20} className="text-orange-500 mb-1" />
-                              <span className="text-3xl font-bold text-orange-700">{w.temp}°C</span>
-                              <span className="text-[10px] text-orange-500 font-semibold uppercase tracking-wide mt-0.5">Temperature</span>
-                            </div>
-
-                            {/* Rain */}
-                            <div className="flex flex-col items-center bg-blue-50 border border-blue-100 rounded-xl py-3">
-                              <Droplets size={20} className={`mb-1 ${rainCls(w.rain)}`} />
-                              <span className={`text-3xl font-bold ${rainCls(w.rain)}`}>{w.rain}%</span>
-                              <div className="w-3/4 bg-blue-100 rounded-full h-1 mt-1">
-                                <div className={`h-1 rounded-full ${w.rain >= config.rainThreshold ? "bg-red-500" : "bg-blue-400"}`} style={{ width: `${Math.min(w.rain, 100)}%` }} />
-                              </div>
-                              <span className="text-[10px] text-blue-500 font-semibold uppercase tracking-wide mt-1">Rain chance</span>
-                            </div>
-
-                            {/* Wind */}
-                            <div className="flex flex-col items-center bg-slate-50 border border-slate-100 rounded-xl py-3">
-                              <Wind size={20} className={`mb-1 ${windCls(w.wind)}`} />
-                              <span className={`text-3xl font-bold ${windCls(w.wind)}`}>{w.wind}</span>
-                              <span className={`text-[10px] font-semibold uppercase tracking-wide mt-0.5 ${windCls(w.wind)}`}>km/h wind</span>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center h-24 text-[#5C7A5C] text-xs text-center gap-1">
-                            <Droplets size={20} className="text-[#C5DDB8]" />
-                            {selected ? "Weather loading…" : "Allow location to see weather"}
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
+            {/* Map */}
+            <div className="flex-1 relative min-h-0">
+              {selected || userLocation ? (
+                <TennisMap
+                  lat={selected ? selected.location.lat : userLocation!.lat}
+                  lng={selected ? selected.location.lng : userLocation!.lng}
+                  label={selected ? selected.location.label : "Your location"}
+                  userLat={userLocation?.lat}
+                  userLng={userLocation?.lng}
+                  defaultView={!selected}
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-[#F0F7EC] text-[#5C7A5C]">
+                  <MapPin size={44} className="text-[#C5DDB8] mb-3" />
+                  <p className="font-semibold text-sm">Waiting for location…</p>
+                  <p className="text-xs mt-1 text-[#A8C99A]">Allow location access to see the map</p>
+                </div>
+              )}
             </div>
+
+            {/* Weather strip */}
+            {(() => {
+              const w = selected?.weather ?? currentWeather;
+              const isLoading = !selected && loadingCurrentWeather;
+              const label = selected ? selected.location.label : "Current location";
+              const timeLabel = selected ? `${fmtDate(selected.startTime)} · ${fmtTime(selected.startTime)}` : "Now";
+              const rainCls = (v: number) => v >= config.rainThreshold ? "text-red-500" : v >= config.rainThreshold * 0.6 ? "text-amber-500" : "text-emerald-600";
+              const windCls = (v: number) => v >= config.windThreshold ? "text-red-500" : v >= config.windThreshold * 0.6 ? "text-amber-500" : "text-emerald-600";
+
+              return (
+                <div className="flex-shrink-0 border-t border-[#E0EDD8] bg-[#F8FCF5] px-4 py-2 flex items-center gap-4 text-xs">
+                  <span className="text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider whitespace-nowrap">
+                    {selected ? "Event" : "Now"}
+                  </span>
+
+                  {isLoading ? (
+                    <RefreshCw size={12} className="animate-spin text-[#5C7A5C]" />
+                  ) : w ? (
+                    <>
+                      <span className={`flex items-center gap-1 font-semibold ${w.isBad ? "text-red-600" : "text-emerald-600"}`}>
+                        {w.isBad ? <AlertTriangle size={12} /> : <CheckCircle2 size={12} />}
+                        {w.isBad ? "Poor" : "Good"}
+                      </span>
+                      <span className="flex items-center gap-1 text-orange-600 font-semibold">
+                        <Thermometer size={12} /> {w.temp}°C
+                      </span>
+                      <span className={`flex items-center gap-1 font-semibold ${rainCls(w.rain)}`}>
+                        <Droplets size={12} /> {w.rain}%
+                      </span>
+                      <span className={`flex items-center gap-1 font-semibold ${windCls(w.wind)}`}>
+                        <Wind size={12} /> {w.wind} km/h
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-[#A8C99A]">{selected ? "Loading…" : "Allow location access"}</span>
+                  )}
+
+                  <span className="ml-auto text-[#5C7A5C] truncate max-w-[200px]">{label} · {timeLabel}</span>
+                </div>
+              );
+            })()}
 
             {/* Tabs */}
             <div className="flex-shrink-0 border-t border-[#C5DDB8] bg-white" style={{ height: 320 }}>
@@ -746,11 +710,14 @@ export default function Dashboard() {
                             value={config.windThreshold}
                             onChange={(e) => {
                               const v = Math.max(1, Math.min(100, Number(e.target.value)));
-                              const next = { ...config, windThreshold: v };
-                              setConfig(next);
+                              setConfig(c => ({ ...c, windThreshold: v }));
                               thresholdsRef.current = { wind: v, rain: config.rainThreshold };
-                              saveConfig(next);
                               loadEvents(dashboardDays, v, config.rainThreshold);
+                            }}
+                            onBlur={(e) => {
+                              const v = Math.max(1, Math.min(100, Number(e.target.value)));
+                              const next = { ...config, windThreshold: v };
+                              saveConfig(next);
                             }}
                             className="w-20 rounded-lg border-2 border-[#C5DDB8] px-3 py-2 text-base font-bold text-[#1B6B2C] text-center bg-[#F0F7EC] focus:outline-none focus:border-[#1B6B2C]"
                           />
@@ -769,11 +736,14 @@ export default function Dashboard() {
                             value={config.rainThreshold}
                             onChange={(e) => {
                               const v = Math.max(1, Math.min(100, Number(e.target.value)));
-                              const next = { ...config, rainThreshold: v };
-                              setConfig(next);
+                              setConfig(c => ({ ...c, rainThreshold: v }));
                               thresholdsRef.current = { wind: config.windThreshold, rain: v };
-                              saveConfig(next);
                               loadEvents(dashboardDays, config.windThreshold, v);
+                            }}
+                            onBlur={(e) => {
+                              const v = Math.max(1, Math.min(100, Number(e.target.value)));
+                              const next = { ...config, rainThreshold: v };
+                              saveConfig(next);
                             }}
                             className="w-20 rounded-lg border-2 border-[#C5DDB8] px-3 py-2 text-base font-bold text-[#1B6B2C] text-center bg-[#F0F7EC] focus:outline-none focus:border-[#1B6B2C]"
                           />
