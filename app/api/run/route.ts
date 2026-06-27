@@ -9,14 +9,17 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   const config = await getConfig();
-  let selectedIndices: number[] | null = null;
-
   const body = await request.json().catch(() => ({}));
-  if (Array.isArray(body.selectedIndices)) selectedIndices = body.selectedIndices;
+
   // Use template from request body if provided (client may have unsaved edits)
   if (body.template && typeof body.template === "object") {
     config.template = { ...config.template, ...body.template };
   }
+
+  // selectedStartTimes: ISO strings of events to include (from the dashboard list)
+  const selectedStartTimes: string[] | null = Array.isArray(body.selectedStartTimes) ? body.selectedStartTimes : null;
+  // Fetch for the same range the dashboard is showing, not just messageDaysForward
+  const daysToFetch: number = typeof body.daysToFetch === "number" ? body.daysToFetch : config.messageDaysForward;
 
   const entry = {
     id: Date.now().toString(),
@@ -33,7 +36,7 @@ export async function POST(request: Request) {
   };
 
   try {
-    const allEvents = await getTennisEvents(config.messageDaysForward);
+    const allEvents = await getTennisEvents(daysToFetch);
     entry.eventsCount = allEvents.length;
 
     if (allEvents.length === 0) {
@@ -41,9 +44,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "No tennis events found" });
     }
 
-    // Filter to selected indices if provided, else send all
-    const events = selectedIndices !== null
-      ? allEvents.filter((_, i) => selectedIndices!.includes(i))
+    // Filter by start times if provided (more reliable than indices across different fetch ranges)
+    const events = selectedStartTimes !== null
+      ? allEvents.filter(e => selectedStartTimes.includes(e.startTime.toISOString()))
       : allEvents;
 
     if (events.length === 0) {

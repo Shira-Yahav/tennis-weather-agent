@@ -33,7 +33,7 @@ export function lookupKnownVenue(venueName: string): LatLng | null {
 export async function geocodeVenue(query: string): Promise<LatLng | null> {
   const key = process.env.GOOGLE_GEOCODING_KEY;
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&language=en&key=${key}`;
-  const res = await fetch(url);
+  const res = await fetch(url, { cache: "no-store" });
   const data = await res.json();
   if (data.status !== "OK" || !data.results[0]) return null;
   const { lat, lng } = data.results[0].geometry.location;

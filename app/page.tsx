@@ -9,10 +9,10 @@ import * as Separator from "@radix-ui/react-separator";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import * as Select from "@radix-ui/react-select";
 import {
-  MapPin, Wind, Thermometer, Droplets, Play,
+  MapPin, Wind, Thermometer, Droplets,
   Clock, CheckCircle2, AlertTriangle, RefreshCw,
   Calendar, FileText, Settings, ChevronRight, MessageSquare,
-  Check, ChevronDown, ChevronUp, Send, Zap,
+  Check, ChevronDown, ChevronUp, Send, Zap, CheckSquare, Square,
 } from "lucide-react";
 
 const TennisMap = dynamic(() => import("@/app/components/TennisMap"), { ssr: false });
@@ -150,7 +150,9 @@ export default function Dashboard() {
   const [toast, setToast] = useState({ open: false, message: "", ok: true });
   const [expandedLog, setExpandedLog] = useState<string | null>(null);
   const [savingSchedule, setSavingSchedule] = useState(false);
+  const [templateSaved, setTemplateSaved] = useState(true);
   const scheduleDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const templateDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showToast = (message: string, ok = true) => setToast({ open: true, message, ok });
 
@@ -208,6 +210,19 @@ export default function Dashboard() {
     } catch { showToast("Failed to save settings", false); }
   };
 
+  const updateTemplate = (field: keyof MessageTemplate, value: string) => {
+    const updated = { ...config.template, [field]: value };
+    setConfig(c => ({ ...c, template: updated }));
+    setTemplateSaved(false);
+    if (templateDebounce.current) clearTimeout(templateDebounce.current);
+    templateDebounce.current = setTimeout(async () => {
+      try {
+        await fetch("/api/config", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...config, template: updated }) });
+        setTemplateSaved(true);
+      } catch { showToast("Failed to save template", false); }
+    }, 800);
+  };
+
   const saveSchedule = (updates: Partial<AppConfig>) => {
     const next = { ...config, ...updates };
     setConfig(next);
@@ -226,10 +241,11 @@ export default function Dashboard() {
     if (checkedIndices.size === 0) { showToast("No events selected", false); return; }
     setRunning(true);
     try {
+      const selectedStartTimes = Array.from(checkedIndices).map(i => events[i].startTime);
       const res = await fetch("/api/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ selectedIndices: Array.from(checkedIndices), template: config.template }),
+        body: JSON.stringify({ selectedStartTimes, daysToFetch: dashboardDays, template: config.template }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Run failed");
@@ -237,15 +253,6 @@ export default function Dashboard() {
       await loadLogs();
     } catch (err) { showToast(String(err), false); }
     finally { setRunning(false); }
-  };
-
-  const toggleCheck = (i: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCheckedIndices(prev => {
-      const next = new Set(prev);
-      next.has(i) ? next.delete(i) : next.add(i);
-      return next;
-    });
   };
 
   const allChecked = events.length > 0 && checkedIndices.size === events.length;
@@ -278,14 +285,16 @@ export default function Dashboard() {
             >
               <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
             </button>
-            <button
-              onClick={doRun}
-              disabled={running || checkedIndices.size === 0}
-              className="flex items-center gap-2 bg-[#D4E534] text-[#1B6B2C] font-bold px-4 py-2 rounded-lg hover:bg-[#c5d82e] transition-colors disabled:opacity-60 text-sm shadow"
-            >
-              {running ? <RefreshCw size={13} className="animate-spin" /> : <Send size={13} />}
-              {checkedIndices.size > 0 ? `Send (${checkedIndices.size})` : "Send"}
-            </button>
+            <span title={checkedIndices.size === 0 ? "Check at least one event on the left to send" : `Send message for ${checkedIndices.size} event(s)`}>
+              <button
+                onClick={doRun}
+                disabled={running || checkedIndices.size === 0}
+                className="flex items-center gap-2 bg-[#D4E534] text-[#1B6B2C] font-bold px-4 py-2 rounded-lg hover:bg-[#c5d82e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm shadow"
+              >
+                {running ? <RefreshCw size={13} className="animate-spin" /> : <Send size={13} />}
+                {checkedIndices.size > 0 ? `Send (${checkedIndices.size})` : "Send"}
+              </button>
+            </span>
           </div>
         </header>
 
@@ -303,8 +312,9 @@ export default function Dashboard() {
               <div className="flex items-center gap-2">
                 {/* Select all toggle */}
                 {events.length > 0 && (
-                  <button onClick={toggleAll} className="text-[10px] text-[#1B6B2C] font-semibold hover:underline">
-                    {allChecked ? "Deselect all" : "Select all"}
+                  <button onClick={toggleAll} title={allChecked ? "Deselect all" : "Select all"}
+                    className="flex items-center gap-1 text-[#1B6B2C] hover:text-[#155523] transition-colors p-1 rounded hover:bg-[#F0F7EC]">
+                    {allChecked ? <CheckSquare size={14} /> : <Square size={14} />}
                   </button>
                 )}
                 {/* Days filter */}
@@ -376,7 +386,7 @@ export default function Dashboard() {
                             {event.weather && (
                               <div className="flex items-center gap-3 mt-2 text-xs text-[#5C7A5C]">
                                 <span className="flex items-center gap-0.5"><Thermometer size={10} className="text-orange-400" />{event.weather.temp}°C</span>
-                                <span className="flex items-center gap-0.5"><Play size={10} className="text-blue-400 rotate-90" />{event.weather.rain}%</span>
+                                <span className="flex items-center gap-0.5"><Droplets size={10} className="text-blue-400" />{event.weather.rain}%</span>
                                 <span className="flex items-center gap-0.5"><Wind size={10} className="text-slate-400" />{event.weather.wind} km/h</span>
                               </div>
                             )}
@@ -492,6 +502,12 @@ export default function Dashboard() {
                     {/* Editors */}
                     <ScrollArea.Root className="flex-1 overflow-hidden border-r border-[#E0EDD8]">
                       <ScrollArea.Viewport className="h-full p-3 space-y-2">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] text-[#5C7A5C]">Edit fields below — changes auto-save</span>
+                          {templateSaved
+                            ? <span className="text-[10px] text-emerald-600 flex items-center gap-1"><CheckCircle2 size={10} />Saved</span>
+                            : <span className="text-[10px] text-amber-600">Saving…</span>}
+                        </div>
                         {(["header", "eventBlock", "footerGood", "footerBad"] as const).map((field) => {
                           const labels: Record<string, string> = {
                             header: "Header — {date} available",
@@ -504,14 +520,13 @@ export default function Dashboard() {
                               <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-1">{labels[field]}</label>
                               <textarea rows={field === "eventBlock" ? 4 : 2}
                                 value={config.template[field]}
-                                onChange={(e) => setConfig(c => ({ ...c, template: { ...c.template, [field]: e.target.value } }))}
-                                onBlur={(e) => saveConfig({ template: { ...config.template, [field]: e.target.value } })}
+                                onChange={(e) => updateTemplate(field, e.target.value)}
                                 className="w-full rounded-lg border border-[#C5DDB8] p-2 text-xs font-mono text-[#1A2B1A] bg-[#F8FCF5] focus:outline-none focus:ring-2 focus:ring-[#1B6B2C] resize-none"
                               />
                             </div>
                           );
                         })}
-                        <button onClick={() => saveConfig({ template: DEFAULT_TEMPLATE })}
+                        <button onClick={() => { saveConfig({ template: DEFAULT_TEMPLATE }); setTemplateSaved(true); }}
                           className="text-[10px] text-[#5C7A5C] underline hover:text-[#1B6B2C]">Reset to default</button>
                       </ScrollArea.Viewport>
                     </ScrollArea.Root>
