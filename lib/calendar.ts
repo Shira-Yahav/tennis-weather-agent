@@ -41,7 +41,6 @@ async function getLocationForEvent(title: string, locationField: string | null):
 function getDateRange(daysForward: number): { start: string; end: string } {
   const israelNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }));
   const start = new Date(israelNow);
-  start.setDate(start.getDate() + 1);
   start.setHours(0, 0, 0, 0);
   const end = new Date(israelNow);
   end.setDate(end.getDate() + daysForward);
