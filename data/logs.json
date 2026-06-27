@@ -1,5 +1,30 @@
 [
   {
+    "id": "1782549211825",
+    "timestamp": "2026-06-27T08:33:31.825Z",
+    "manual": true,
+    "status": "success",
+    "eventsCount": 1,
+    "selectedEvents": 1,
+    "daysForward": 1,
+    "scheduleHour": 16,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "רוקח 4  -  מגרש 7",
+        "startTime": "2026-06-27T15:00:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 28.5,
+          "rain": 0,
+          "wind": 14.1,
+          "isBad": false
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Saturday, 27 June 2026</b>\n\n<b>רוקח 4  -  מגרש 7</b>\n🕐 18:00–19:00\n📍 Rokach 4, Tel Aviv\n🌡 28.5°C  🌧 Rain: 0%  💨 Wind: 14.1 km/h\n✅ Good conditions\n\nAll clear — enjoy your game! 🎾"
+  },
+  {
     "id": "1782549179567",
     "timestamp": "2026-06-27T08:32:59.567Z",
     "manual": true,
