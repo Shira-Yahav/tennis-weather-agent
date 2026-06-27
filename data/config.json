@@ -8,6 +8,6 @@
     "footerGood": "All clear — enjoy your game! 🎾",
     "footerBad": "⚠️ <b>Weather is not ideal. Consider cancelling or rescheduling.</b>"
   },
-  "windThreshold": 1,
+  "windThreshold": 2,
   "rainThreshold": 30
 }
