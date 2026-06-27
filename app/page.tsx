@@ -435,7 +435,7 @@ export default function Dashboard() {
                           </Checkbox.Root>
 
                           {/* Event card (clickable → map) */}
-                          <button className="flex-1 text-left min-w-0" onClick={() => setSelected(event)}>
+                          <button className="flex-1 text-left min-w-0" onClick={() => setSelected(s => s === event ? null : event)}>
                             <div className="flex items-start justify-between gap-2 mb-1.5">
                               <span className="text-[#1B6B2C] font-bold text-sm">{fmtDate(event.startTime)}</span>
                               {event.weather
@@ -529,7 +529,14 @@ export default function Dashboard() {
                     <span className="text-[#A8C99A]">{selected ? "Loading…" : "Allow location access"}</span>
                   )}
 
-                  <span className="ml-auto text-[#5C7A5C] truncate max-w-[200px]">{label} · {timeLabel}</span>
+                  <span className="ml-auto flex items-center gap-2">
+                    {selected && (
+                      <button onClick={() => setSelected(null)} className="flex items-center gap-1 text-[10px] font-semibold text-[#5C7A5C] hover:text-[#1B6B2C] border border-[#C5DDB8] rounded-full px-2 py-0.5 hover:border-[#1B6B2C] transition-colors">
+                        <MapPin size={9} /> My location
+                      </button>
+                    )}
+                    <span className="text-[#5C7A5C] truncate max-w-[180px]">{label} · {timeLabel}</span>
+                  </span>
                 </div>
               );
             })()}
