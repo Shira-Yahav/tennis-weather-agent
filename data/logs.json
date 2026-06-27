@@ -1,5 +1,52 @@
 [
   {
+    "id": "1782556916298",
+    "timestamp": "2026-06-27T10:41:56.298Z",
+    "manual": true,
+    "status": "success",
+    "eventsCount": 3,
+    "selectedEvents": 3,
+    "daysForward": 1,
+    "scheduleHour": 16,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "Rokach 4, Tel Aviv — Court 7",
+        "startTime": "2026-06-27T15:00:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 28.6,
+          "rain": 0,
+          "wind": 14.2,
+          "isBad": true
+        }
+      },
+      {
+        "title": "Tennis",
+        "startTime": "2026-06-29T15:30:00.000Z",
+        "location": "Rokach Blvd 4, Tel Aviv-Yafo, Israel",
+        "weather": {
+          "temp": 28.9,
+          "rain": 0,
+          "wind": 15,
+          "isBad": true
+        }
+      },
+      {
+        "title": "Tennis",
+        "startTime": "2026-07-01T16:30:00.000Z",
+        "location": "Rokach Blvd 4, Tel Aviv-Yafo, Israel",
+        "weather": {
+          "temp": 28.5,
+          "rain": 0,
+          "wind": 13.3,
+          "isBad": false
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Saturday, 27 June 2026 – Wednesday, 1 July 2026</b>\n\n📅 <b>Saturday, 27 June 2026</b>\n<b>Rokach 4, Tel Aviv — Court 7</b>\n🕐 18:00–19:00\n📍 Rokach 4, Tel Aviv\n🌡 28.6°C  🌧 Rain: 0%  💨 Wind: 14.2 km/h\n⚠️ Bad conditions\n\n📅 <b>Monday, 29 June 2026</b>\n<b>Tennis</b>\n🕐 18:30–20:30\n📍 Rokach Blvd 4, Tel Aviv-Yafo, Israel\n🌡 28.9°C  🌧 Rain: 0%  💨 Wind: 15 km/h\n⚠️ Bad conditions\n\n📅 <b>Wednesday, 1 July 2026</b>\n<b>Tennis</b>\n🕐 19:30–21:30\n📍 Rokach Blvd 4, Tel Aviv-Yafo, Israel\n🌡 28.5°C  🌧 Rain: 0%  💨 Wind: 13.3 km/h\n✅ Good conditions\n\n⚠️ <b>Poor weather for: Rokach 4, Tel Aviv — Court 7, Tennis. Consider rescheduling those sessions.</b>"
+  },
+  {
     "id": "1782556370321",
     "timestamp": "2026-06-27T10:32:50.321Z",
     "manual": true,
