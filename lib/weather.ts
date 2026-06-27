@@ -7,7 +7,12 @@ export interface WeatherConditions {
   isBad: boolean;
 }
 
-export async function getWeatherForEvent(location: LatLng, eventTime: Date): Promise<WeatherConditions> {
+export async function getWeatherForEvent(
+  location: LatLng,
+  eventTime: Date,
+  windThreshold = 20,
+  rainThreshold = 30,
+): Promise<WeatherConditions> {
   const date = eventTime.toISOString().split("T")[0];
   const url = new URL("https://api.open-meteo.com/v1/forecast");
   url.searchParams.set("latitude", location.lat.toString());
@@ -34,7 +39,7 @@ export async function getWeatherForEvent(location: LatLng, eventTime: Date): Pro
   const rainProbability = rainProbs[safeIdx] ?? 0;
   const windSpeed = windSpeeds[safeIdx] ?? 0;
   const temperature = temperatures[safeIdx] ?? 0;
-  const isBad = windSpeed >= 20 || rainProbability >= 30;
+  const isBad = windSpeed >= windThreshold || rainProbability >= rainThreshold;
 
   return { rainProbability, windSpeed, temperature, isBad };
 }

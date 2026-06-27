@@ -8,13 +8,15 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const days = Math.min(Math.max(parseInt(searchParams.get("days") ?? "7"), 1), 30);
+    const windThreshold = parseInt(searchParams.get("windThreshold") ?? "20");
+    const rainThreshold = parseInt(searchParams.get("rainThreshold") ?? "30");
     const events = await getTennisEvents(days);
 
     const withWeather = await Promise.all(
       events.map(async (event) => {
         let weather = null;
         try {
-          const w = await getWeatherForEvent(event.location, event.startTime);
+          const w = await getWeatherForEvent(event.location, event.startTime, windThreshold, rainThreshold);
           weather = {
             temp: w.temperature,
             rain: w.rainProbability,

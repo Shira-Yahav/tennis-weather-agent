@@ -1,10 +1,12 @@
 import { DEFAULT_TEMPLATE, type MessageTemplate } from "./formatter";
 
 export interface AppConfig {
-  messageDaysForward: number; // days included in Telegram message (default 1 = tomorrow only)
-  scheduleHour: number;       // Israel time hour (default 16)
-  scheduleMinute: number;     // minute (default 0)
+  messageDaysForward: number;
+  scheduleHour: number;
+  scheduleMinute: number;
   template: MessageTemplate;
+  windThreshold: number;  // km/h — default 20
+  rainThreshold: number;  // % — default 30
 }
 
 export const DEFAULT_CONFIG: AppConfig = {
@@ -12,6 +14,8 @@ export const DEFAULT_CONFIG: AppConfig = {
   scheduleHour: 16,
   scheduleMinute: 0,
   template: DEFAULT_TEMPLATE,
+  windThreshold: 20,
+  rainThreshold: 30,
 };
 
 export interface LogEntry {

@@ -20,6 +20,27 @@ function isHebrewVenueFormat(title: string): boolean {
   return title.includes("מגרש");
 }
 
+function hasHebrew(str: string): boolean {
+  return /[֐-׿א-ת]/.test(str);
+}
+
+function toEnglishTitle(rawTitle: string, venueLabel: string): string {
+  if (!hasHebrew(rawTitle)) return rawTitle;
+
+  // For court-format events: use the English venue label + court number
+  if (isHebrewVenueFormat(rawTitle)) {
+    const courtMatch = rawTitle.match(/מגרש\s*(\d+)/);
+    const courtStr = courtMatch ? ` — Court ${courtMatch[1]}` : "";
+    return venueLabel + courtStr;
+  }
+
+  // Simple token replacements for tennis-keyword events
+  return rawTitle
+    .replace(/טניס/g, "Tennis")
+    .replace(/אימון/g, "Practice")
+    .replace(/מגרש\s*\d*/g, "Court");
+}
+
 async function getLocationForEvent(title: string, locationField: string | null): Promise<LatLng> {
   if (isTennisEvent(title)) {
     if (locationField && locationField.trim()) {
@@ -88,7 +109,8 @@ export async function getTennisEvents(daysForward = 1): Promise<TennisEvent[]> {
     const locationField = event.location ?? null;
 
     const location = await getLocationForEvent(title, locationField);
-    tennisEvents.push({ title, startTime, endTime, location });
+    const englishTitle = toEnglishTitle(title, location.label);
+    tennisEvents.push({ title: englishTitle, startTime, endTime, location });
   }
 
   return tennisEvents;

@@ -21,10 +21,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: "No tennis events tomorrow" });
   }
 
+  const windThreshold = config.windThreshold ?? 20;
+  const rainThreshold = config.rainThreshold ?? 30;
   const items = await Promise.all(
     events.map(async (event) => ({
       event,
-      weather: await getWeatherForEvent(event.location, event.startTime),
+      weather: await getWeatherForEvent(event.location, event.startTime, windThreshold, rainThreshold),
     }))
   );
 

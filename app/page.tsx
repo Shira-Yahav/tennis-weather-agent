@@ -33,7 +33,7 @@ interface LogEntry {
   message: string; error?: string;
 }
 interface MessageTemplate { header: string; eventBlock: string; footerGood: string; footerBad: string }
-interface AppConfig { messageDaysForward: number; scheduleHour: number; scheduleMinute: number; template: MessageTemplate }
+interface AppConfig { messageDaysForward: number; scheduleHour: number; scheduleMinute: number; template: MessageTemplate; windThreshold: number; rainThreshold: number }
 
 const DEFAULT_TEMPLATE: MessageTemplate = {
   header: "🎾 <b>Tennis — {date}</b>",
@@ -116,20 +116,21 @@ function WeatherPanel({ w, label, startTime }: { w: EventWeather; label: string;
 }
 
 function DigitalClockInput({ hour, minute, onChange }: { hour: number; minute: number; onChange: (h: number, m: number) => void }) {
+  const spinCls = "text-[#1B6B2C] hover:text-[#155523] hover:bg-[#E0EDD8] rounded p-0.5 transition-colors";
   return (
-    <div className="inline-flex items-center gap-1 bg-[#1A2B1A] rounded-xl px-4 py-3 select-none">
-      <div className="flex flex-col items-center gap-1">
-        <button onClick={() => onChange((hour + 1) % 24, minute)} className="text-green-400 hover:text-green-300 transition-colors p-0.5"><ChevronUp size={14} /></button>
-        <span className="text-2xl font-bold font-mono text-[#D4E534] w-10 text-center leading-none">{pad(hour)}</span>
-        <button onClick={() => onChange((hour - 1 + 24) % 24, minute)} className="text-green-400 hover:text-green-300 transition-colors p-0.5"><ChevronDown size={14} /></button>
+    <div className="inline-flex items-center gap-1 bg-[#F0F7EC] border-2 border-[#C5DDB8] rounded-xl px-4 py-2 select-none">
+      <div className="flex flex-col items-center gap-0.5">
+        <button onClick={() => onChange((hour + 1) % 24, minute)} className={spinCls}><ChevronUp size={13} /></button>
+        <span className="text-2xl font-bold font-mono text-[#1B6B2C] w-9 text-center leading-none">{pad(hour)}</span>
+        <button onClick={() => onChange((hour - 1 + 24) % 24, minute)} className={spinCls}><ChevronDown size={13} /></button>
       </div>
-      <span className="text-2xl font-bold text-[#D4E534] pb-0.5">:</span>
-      <div className="flex flex-col items-center gap-1">
-        <button onClick={() => onChange(hour, (minute + 5) % 60)} className="text-green-400 hover:text-green-300 transition-colors p-0.5"><ChevronUp size={14} /></button>
-        <span className="text-2xl font-bold font-mono text-[#D4E534] w-10 text-center leading-none">{pad(minute)}</span>
-        <button onClick={() => onChange(hour, (minute - 5 + 60) % 60)} className="text-green-400 hover:text-green-300 transition-colors p-0.5"><ChevronDown size={14} /></button>
+      <span className="text-2xl font-bold text-[#1B6B2C] pb-0.5">:</span>
+      <div className="flex flex-col items-center gap-0.5">
+        <button onClick={() => onChange(hour, (minute + 5) % 60)} className={spinCls}><ChevronUp size={13} /></button>
+        <span className="text-2xl font-bold font-mono text-[#1B6B2C] w-9 text-center leading-none">{pad(minute)}</span>
+        <button onClick={() => onChange(hour, (minute - 5 + 60) % 60)} className={spinCls}><ChevronDown size={13} /></button>
       </div>
-      <span className="text-xs text-green-400 ml-1 self-center">IL</span>
+      <span className="text-[10px] text-[#5C7A5C] ml-1.5 self-center font-semibold">IL</span>
     </div>
   );
 }
@@ -143,7 +144,7 @@ export default function Dashboard() {
   // Indices of events checked for sending; defaults to first upcoming event (index 0)
   const [checkedIndices, setCheckedIndices] = useState<Set<number>>(new Set());
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [config, setConfig] = useState<AppConfig>({ messageDaysForward: 1, scheduleHour: 16, scheduleMinute: 0, template: DEFAULT_TEMPLATE });
+  const [config, setConfig] = useState<AppConfig>({ messageDaysForward: 1, scheduleHour: 16, scheduleMinute: 0, template: DEFAULT_TEMPLATE, windThreshold: 20, rainThreshold: 30 });
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
@@ -156,11 +157,13 @@ export default function Dashboard() {
 
   const showToast = (message: string, ok = true) => setToast({ open: true, message, ok });
 
-  const loadEvents = useCallback(async (days?: number) => {
+  const loadEvents = useCallback(async (days?: number, wind?: number, rain?: number) => {
     const d = days ?? dashboardDays;
+    const w = wind ?? config.windThreshold;
+    const r = rain ?? config.rainThreshold;
     setLoading(true);
     try {
-      const res = await fetch(`/api/events?days=${d}`);
+      const res = await fetch(`/api/events?days=${d}&windThreshold=${w}&rainThreshold=${r}`);
       if (!res.ok) throw new Error("Failed");
       const data: TennisEvent[] = await res.json();
       setEvents(data);
@@ -427,7 +430,7 @@ export default function Dashboard() {
                   {[
                     { value: "logs", icon: <Zap size={13} />, label: "Message Log" },
                     { value: "template", icon: <FileText size={13} />, label: "Message Template" },
-                    { value: "schedule", icon: <Settings size={13} />, label: "Schedule" },
+                    { value: "settings", icon: <Settings size={13} />, label: "Settings" },
                   ].map((tab) => (
                     <Tabs.Trigger key={tab.value} value={tab.value}
                       className="flex items-center gap-1.5 px-4 py-2.5 text-xs text-[#5C7A5C] font-semibold border-b-2 border-transparent data-[state=active]:border-[#1B6B2C] data-[state=active]:text-[#1B6B2C] transition-colors"
@@ -500,8 +503,7 @@ export default function Dashboard() {
                 <Tabs.Content value="template" className="flex-1 overflow-hidden">
                   <div className="flex h-full">
                     {/* Editors */}
-                    <ScrollArea.Root className="flex-1 overflow-hidden border-r border-[#E0EDD8]">
-                      <ScrollArea.Viewport className="h-full p-3 space-y-2">
+                    <div className="flex-1 overflow-y-auto border-r border-[#E0EDD8] p-3 space-y-2">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-[10px] text-[#5C7A5C]">Edit fields below — changes auto-save</span>
                           {templateSaved
@@ -528,8 +530,7 @@ export default function Dashboard() {
                         })}
                         <button onClick={() => { saveConfig({ template: DEFAULT_TEMPLATE }); setTemplateSaved(true); }}
                           className="text-[10px] text-[#5C7A5C] underline hover:text-[#1B6B2C]">Reset to default</button>
-                      </ScrollArea.Viewport>
-                    </ScrollArea.Root>
+                    </div>
 
                     {/* Variables */}
                     <div className="w-36 flex-shrink-0 border-r border-[#E0EDD8] p-2 overflow-auto bg-[#F8FCF5]">
@@ -577,42 +578,95 @@ export default function Dashboard() {
                   </div>
                 </Tabs.Content>
 
-                {/* Schedule */}
-                <Tabs.Content value="schedule" className="flex-1 overflow-auto p-4">
-                  <div className="flex gap-8 items-start">
-                    <div>
-                      <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-2">
-                        Message lookhead — days included in Telegram
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number" min={1} max={30}
-                          value={config.messageDaysForward}
-                          onChange={(e) => saveConfig({ messageDaysForward: Math.max(1, Math.min(30, Number(e.target.value))) })}
-                          className="w-20 rounded-lg border-2 border-[#C5DDB8] px-3 py-2 text-lg font-bold text-[#1B6B2C] text-center bg-[#F8FCF5] focus:outline-none focus:border-[#1B6B2C]"
-                        />
-                        <span className="text-sm text-[#5C7A5C]">days</span>
+                {/* Settings */}
+                <Tabs.Content value="settings" className="flex-1 overflow-auto">
+                  <div className="flex h-full divide-x divide-[#E0EDD8]">
+
+                    {/* Bad weather thresholds */}
+                    <div className="flex-1 p-4 space-y-4">
+                      <div>
+                        <p className="text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-3">Bad weather thresholds</p>
+                        <p className="text-[10px] text-[#5C7A5C] mb-3">Weather is flagged as bad if wind OR rain exceeds these values.</p>
                       </div>
-                      <p className="text-[10px] text-[#5C7A5C] mt-2 max-w-[180px]">
-                        Default 1 = tomorrow only. Increase to include more days in each notification.
-                      </p>
+
+                      {/* Wind */}
+                      <div>
+                        <label className="block text-xs font-semibold text-[#1A2B1A] mb-1.5 flex items-center gap-1.5">
+                          <Wind size={13} className="text-[#1B6B2C]" /> Wind speed threshold
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input type="number" min={1} max={100}
+                            value={config.windThreshold}
+                            onChange={(e) => {
+                              const v = Math.max(1, Math.min(100, Number(e.target.value)));
+                              const next = { ...config, windThreshold: v };
+                              setConfig(next);
+                              saveConfig({ windThreshold: v });
+                              loadEvents(dashboardDays, v, config.rainThreshold);
+                            }}
+                            className="w-20 rounded-lg border-2 border-[#C5DDB8] px-3 py-2 text-base font-bold text-[#1B6B2C] text-center bg-[#F0F7EC] focus:outline-none focus:border-[#1B6B2C]"
+                          />
+                          <span className="text-sm text-[#5C7A5C]">km/h</span>
+                          <span className="text-[10px] text-[#5C7A5C] ml-1">Current: {config.windThreshold} km/h</span>
+                        </div>
+                      </div>
+
+                      {/* Rain */}
+                      <div>
+                        <label className="block text-xs font-semibold text-[#1A2B1A] mb-1.5 flex items-center gap-1.5">
+                          <Droplets size={13} className="text-[#1B6B2C]" /> Rain probability threshold
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input type="number" min={1} max={100}
+                            value={config.rainThreshold}
+                            onChange={(e) => {
+                              const v = Math.max(1, Math.min(100, Number(e.target.value)));
+                              const next = { ...config, rainThreshold: v };
+                              setConfig(next);
+                              saveConfig({ rainThreshold: v });
+                              loadEvents(dashboardDays, config.windThreshold, v);
+                            }}
+                            className="w-20 rounded-lg border-2 border-[#C5DDB8] px-3 py-2 text-base font-bold text-[#1B6B2C] text-center bg-[#F0F7EC] focus:outline-none focus:border-[#1B6B2C]"
+                          />
+                          <span className="text-sm text-[#5C7A5C]">%</span>
+                          <span className="text-[10px] text-[#5C7A5C] ml-1">Current: {config.rainThreshold}%</span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="w-px bg-[#C5DDB8] self-stretch" />
+                    <div className="w-px bg-[#E0EDD8]" />
 
-                    <div>
-                      <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-2">
-                        Daily send time (Israel time)
-                        {savingSchedule && <span className="ml-2 text-amber-600 normal-case">saving...</span>}
-                      </label>
-                      <DigitalClockInput
-                        hour={config.scheduleHour}
-                        minute={config.scheduleMinute}
-                        onChange={(h, m) => saveSchedule({ scheduleHour: h, scheduleMinute: m })}
-                      />
-                      <p className="text-[10px] text-[#5C7A5C] mt-2 max-w-[200px]">
-                        Changing the time auto-commits a new schedule to GitHub. Vercel redeploys in ~1 min.
-                      </p>
+                    {/* Schedule */}
+                    <div className="flex-1 p-4 space-y-4">
+                      <p className="text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider">Schedule</p>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-[#1A2B1A] mb-1.5 flex items-center gap-1.5">
+                          <Calendar size={13} className="text-[#1B6B2C]" /> Message lookhead
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input type="number" min={1} max={30}
+                            value={config.messageDaysForward}
+                            onChange={(e) => saveConfig({ messageDaysForward: Math.max(1, Math.min(30, Number(e.target.value))) })}
+                            className="w-20 rounded-lg border-2 border-[#C5DDB8] px-3 py-2 text-base font-bold text-[#1B6B2C] text-center bg-[#F0F7EC] focus:outline-none focus:border-[#1B6B2C]"
+                          />
+                          <span className="text-sm text-[#5C7A5C]">days ahead</span>
+                        </div>
+                        <p className="text-[10px] text-[#5C7A5C] mt-1">1 = tomorrow only</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-[#1A2B1A] mb-1.5 flex items-center gap-1.5">
+                          <Clock size={13} className="text-[#1B6B2C]" /> Daily send time
+                          {savingSchedule && <span className="text-amber-600 text-[10px] font-normal">saving…</span>}
+                        </label>
+                        <DigitalClockInput
+                          hour={config.scheduleHour}
+                          minute={config.scheduleMinute}
+                          onChange={(h, m) => saveSchedule({ scheduleHour: h, scheduleMinute: m })}
+                        />
+                        <p className="text-[10px] text-[#5C7A5C] mt-1">Israel time · triggers GitHub redeploy</p>
+                      </div>
                     </div>
                   </div>
                 </Tabs.Content>
