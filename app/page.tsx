@@ -154,56 +154,68 @@ export default function Dashboard() {
   const [templateSaved, setTemplateSaved] = useState(true);
   const scheduleDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const templateDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Ref holds latest thresholds so loadEvents never has a stale closure over config
+  const thresholdsRef = useRef({ wind: 20, rain: 30 });
+  const dashboardDaysRef = useRef(dashboardDays);
 
   const showToast = (message: string, ok = true) => setToast({ open: true, message, ok });
 
   const loadEvents = useCallback(async (days?: number, wind?: number, rain?: number) => {
-    const d = days ?? dashboardDays;
-    const w = wind ?? config.windThreshold;
-    const r = rain ?? config.rainThreshold;
+    const d = days ?? dashboardDaysRef.current;
+    const w = wind ?? thresholdsRef.current.wind;
+    const r = rain ?? thresholdsRef.current.rain;
     setLoading(true);
     try {
       const res = await fetch(`/api/events?days=${d}&windThreshold=${w}&rainThreshold=${r}`);
       if (!res.ok) throw new Error("Failed");
       const data: TennisEvent[] = await res.json();
       setEvents(data);
-      // Default selection: first upcoming event; preserve existing selections if events still exist
       setCheckedIndices(prev => {
         if (prev.size === 0 && data.length > 0) return new Set([0]);
-        // Keep indices that still exist
         const next = new Set<number>();
         prev.forEach(i => { if (i < data.length) next.add(i); });
-        // If nothing survived, default to first
         if (next.size === 0 && data.length > 0) next.add(0);
         return next;
       });
-      // Clear selected event if it no longer exists
       setSelected(prev => {
         if (!prev) return null;
-        const stillExists = data.some(e => e.title === prev.title && e.startTime === prev.startTime);
-        return stillExists ? prev : null;
+        return data.some(e => e.title === prev.title && e.startTime === prev.startTime) ? prev : null;
       });
       setLastRefresh(new Date());
     } catch { showToast("Failed to refresh calendar", false); }
     finally { setLoading(false); }
-  }, [dashboardDays]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadLogs = useCallback(async () => {
     try { const r = await fetch("/api/logs"); const d = await r.json(); setLogs(Array.isArray(d) ? d : []); } catch {}
   }, []);
 
-  const loadConfig = useCallback(async () => {
-    try { const r = await fetch("/api/config"); const d = await r.json(); setConfig(d); } catch {}
-  }, []);
-
+  // Load config first, then events with correct thresholds
   useEffect(() => {
-    loadEvents(); loadLogs(); loadConfig();
+    const init = async () => {
+      try {
+        const r = await fetch("/api/config");
+        const cfg: AppConfig = await r.json();
+        setConfig(cfg);
+        thresholdsRef.current = { wind: cfg.windThreshold ?? 20, rain: cfg.rainThreshold ?? 30 };
+        dashboardDaysRef.current = dashboardDays;
+        await loadEvents(dashboardDays, cfg.windThreshold, cfg.rainThreshold);
+      } catch {
+        await loadEvents();
+      }
+      loadLogs();
+    };
+    init();
     const t = setInterval(() => loadEvents(), 60000);
     return () => clearInterval(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => { loadEvents(dashboardDays); }, [dashboardDays, loadEvents]);
+  useEffect(() => {
+    dashboardDaysRef.current = dashboardDays;
+    loadEvents(dashboardDays);
+  }, [dashboardDays, loadEvents]);
 
   const saveConfig = async (updates: Partial<AppConfig>) => {
     const next = { ...config, ...updates, template: { ...config.template, ...(updates.template ?? {}) } };
@@ -601,7 +613,8 @@ export default function Dashboard() {
                               const v = Math.max(1, Math.min(100, Number(e.target.value)));
                               const next = { ...config, windThreshold: v };
                               setConfig(next);
-                              saveConfig({ windThreshold: v });
+                              thresholdsRef.current = { wind: v, rain: config.rainThreshold };
+                              saveConfig(next);
                               loadEvents(dashboardDays, v, config.rainThreshold);
                             }}
                             className="w-20 rounded-lg border-2 border-[#C5DDB8] px-3 py-2 text-base font-bold text-[#1B6B2C] text-center bg-[#F0F7EC] focus:outline-none focus:border-[#1B6B2C]"
@@ -623,7 +636,8 @@ export default function Dashboard() {
                               const v = Math.max(1, Math.min(100, Number(e.target.value)));
                               const next = { ...config, rainThreshold: v };
                               setConfig(next);
-                              saveConfig({ rainThreshold: v });
+                              thresholdsRef.current = { wind: config.windThreshold, rain: v };
+                              saveConfig(next);
                               loadEvents(dashboardDays, config.windThreshold, v);
                             }}
                             className="w-20 rounded-lg border-2 border-[#C5DDB8] px-3 py-2 text-base font-bold text-[#1B6B2C] text-center bg-[#F0F7EC] focus:outline-none focus:border-[#1B6B2C]"

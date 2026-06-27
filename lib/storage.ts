@@ -70,7 +70,9 @@ async function githubPut(path: string, content: string, sha?: string, message?: 
   });
 }
 
-// ── Config (Redis-backed, falls back to defaults) ────────────────────────────
+// ── Config (GitHub-backed, Upstash optional) ─────────────────────────────────
+
+const CONFIG_PATH = "data/config.json";
 
 function getRedis() {
   if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) return null;
@@ -80,23 +82,40 @@ function getRedis() {
 }
 
 export async function getConfig(): Promise<AppConfig> {
+  // Try Upstash first if available
   const redis = getRedis();
-  if (!redis) return DEFAULT_CONFIG;
-  try {
-    const stored = await redis.get<AppConfig>("tennis:config");
-    if (!stored) return DEFAULT_CONFIG;
-    return {
-      ...DEFAULT_CONFIG,
-      ...stored,
-      template: { ...DEFAULT_CONFIG.template, ...(stored.template ?? {}) },
-    };
-  } catch { return DEFAULT_CONFIG; }
+  if (redis) {
+    try {
+      const stored = await redis.get<AppConfig>("tennis:config");
+      if (stored) return { ...DEFAULT_CONFIG, ...stored, template: { ...DEFAULT_CONFIG.template, ...(stored.template ?? {}) } };
+    } catch {}
+  }
+
+  // Fall back to GitHub-stored config
+  const file = await githubGet(CONFIG_PATH);
+  if (file) {
+    try {
+      const parsed = JSON.parse(Buffer.from(file.content, "base64").toString("utf-8"));
+      return { ...DEFAULT_CONFIG, ...parsed, template: { ...DEFAULT_CONFIG.template, ...(parsed.template ?? {}) } };
+    } catch {}
+  }
+
+  return DEFAULT_CONFIG;
 }
 
 export async function saveConfig(config: AppConfig): Promise<void> {
+  // Save to Upstash if available
   const redis = getRedis();
-  if (!redis) return;
-  await redis.set("tennis:config", config);
+  if (redis) { try { await redis.set("tennis:config", config); } catch {} }
+
+  // Always save to GitHub for persistence
+  const file = await githubGet(CONFIG_PATH);
+  await githubPut(
+    CONFIG_PATH,
+    JSON.stringify(config, null, 2),
+    file?.sha,
+    "chore: update config",
+  );
 }
 
 // ── Logs (GitHub-backed) ─────────────────────────────────────────────────────
