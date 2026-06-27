@@ -51,18 +51,45 @@ function applyEventBlock(tpl: string, event: TennisEvent, weather: WeatherCondit
 }
 
 export function formatMessage(items: EventWithWeather[], template: MessageTemplate = DEFAULT_TEMPLATE): string {
+  if (items.length === 0) return "";
+
   const anyBad = items.some((i) => i.weather.isBad);
-  const date = fmtDate(items[0].event.startTime);
+  const allBad = items.every((i) => i.weather.isBad);
+
+  // Detect multi-date: if events span more than one calendar day, show a date label per event
+  const uniqueDates = new Set(items.map((i) => fmtDate(i.event.startTime)));
+  const multipleDate = uniqueDates.size > 1;
+
+  const headerDate = multipleDate
+    ? `${fmtDate(items[0].event.startTime)} – ${fmtDate(items[items.length - 1].event.startTime)}`
+    : fmtDate(items[0].event.startTime);
 
   const lines: string[] = [];
-  lines.push(template.header.replace(/{date}/g, date));
+  lines.push(template.header.replace(/{date}/g, headerDate));
   lines.push("");
 
   for (const { event, weather } of items) {
+    if (multipleDate) {
+      lines.push(`📅 <b>${fmtDate(event.startTime)}</b>`);
+    }
     lines.push(applyEventBlock(template.eventBlock, event, weather));
     lines.push("");
   }
 
-  lines.push(anyBad ? template.footerBad : template.footerGood);
+  let footer: string;
+  if (!anyBad) {
+    footer = template.footerGood;
+  } else if (allBad) {
+    footer = template.footerBad;
+  } else {
+    // Mixed: name the specific bad sessions
+    const badTitles = items
+      .filter((i) => i.weather.isBad)
+      .map((i) => i.event.title)
+      .join(", ");
+    footer = `⚠️ <b>Poor weather for: ${badTitles}. Consider rescheduling those sessions.</b>`;
+  }
+  lines.push(footer);
+
   return lines.join("\n");
 }

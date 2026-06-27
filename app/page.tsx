@@ -252,15 +252,26 @@ export default function Dashboard() {
     }, 1500);
   };
 
+  // Checked events that have weather loaded
+  const checkedWithWeather = Array.from(checkedIndices).filter(i => events[i]?.weather !== null);
+  const weatherPending = loading || (checkedIndices.size > 0 && checkedWithWeather.length < checkedIndices.size);
+
   const doRun = async () => {
     if (checkedIndices.size === 0) { showToast("No events selected", false); return; }
+    if (weatherPending) { showToast("Weather is still loading, please wait", false); return; }
     setRunning(true);
     try {
       const selectedStartTimes = Array.from(checkedIndices).map(i => events[i].startTime);
       const res = await fetch("/api/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ selectedStartTimes, daysToFetch: dashboardDays, template: config.template }),
+        body: JSON.stringify({
+          selectedStartTimes,
+          daysToFetch: dashboardDays,
+          template: config.template,
+          windThreshold: config.windThreshold,
+          rainThreshold: config.rainThreshold,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Run failed");
@@ -300,14 +311,22 @@ export default function Dashboard() {
             >
               <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
             </button>
-            <span title={checkedIndices.size === 0 ? "Check at least one event on the left to send" : `Send message for ${checkedIndices.size} event(s)`}>
+            <span title={
+              checkedIndices.size === 0 ? "Check at least one event to send"
+              : weatherPending ? "Waiting for weather data…"
+              : `Send message for ${checkedIndices.size} event(s)`
+            }>
               <button
                 onClick={doRun}
-                disabled={running || checkedIndices.size === 0}
+                disabled={running || checkedIndices.size === 0 || weatherPending}
                 className="flex items-center gap-2 bg-[#D4E534] text-[#1B6B2C] font-bold px-4 py-2 rounded-lg hover:bg-[#c5d82e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm shadow"
               >
-                {running ? <RefreshCw size={13} className="animate-spin" /> : <Send size={13} />}
-                {checkedIndices.size > 0 ? `Send (${checkedIndices.size})` : "Send"}
+                {running ? <RefreshCw size={13} className="animate-spin" />
+                  : weatherPending ? <RefreshCw size={13} className="animate-spin" />
+                  : <Send size={13} />}
+                {weatherPending ? "Loading…"
+                  : checkedIndices.size > 0 ? `Send (${checkedIndices.size})`
+                  : "Send"}
               </button>
             </span>
           </div>
@@ -389,7 +408,9 @@ export default function Dashboard() {
                           <button className="flex-1 text-left min-w-0" onClick={() => setSelected(event)}>
                             <div className="flex items-start justify-between gap-2 mb-1.5">
                               <span className="text-[#1B6B2C] font-bold text-sm">{fmtDate(event.startTime)}</span>
-                              <WeatherBadge w={event.weather} />
+                              {event.weather
+                                ? <WeatherBadge w={event.weather} />
+                                : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-gray-100 text-gray-500"><RefreshCw size={9} className="animate-spin" />Weather…</span>}
                             </div>
                             <p className="text-[#1A2B1A] font-semibold text-xs leading-tight line-clamp-2 mb-2">{event.title}</p>
                             <div className="flex items-center gap-1 text-xs text-[#5C7A5C] mb-1">

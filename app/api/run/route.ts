@@ -11,10 +11,12 @@ export async function POST(request: Request) {
   const config = await getConfig();
   const body = await request.json().catch(() => ({}));
 
-  // Use template from request body if provided (client may have unsaved edits)
+  // Use values from request body if provided (avoids race with async GitHub config write)
   if (body.template && typeof body.template === "object") {
     config.template = { ...config.template, ...body.template };
   }
+  if (typeof body.windThreshold === "number") config.windThreshold = body.windThreshold;
+  if (typeof body.rainThreshold === "number") config.rainThreshold = body.rainThreshold;
 
   // selectedStartTimes: ISO strings of events to include (from the dashboard list)
   const selectedStartTimes: string[] | null = Array.isArray(body.selectedStartTimes) ? body.selectedStartTimes : null;
