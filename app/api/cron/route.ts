@@ -29,24 +29,23 @@ export async function GET(request: Request) {
   );
 
   const message = formatMessage(items, config.template);
-
   await sendTelegramMessage(message);
 
   await appendLog({
     id: Date.now().toString(),
     timestamp: new Date().toISOString(),
     manual: false,
+    status: "success",
     eventsCount: events.length,
+    selectedEvents: events.length,
+    daysForward: 1,
+    scheduleHour: config.scheduleHour,
+    scheduleMinute: config.scheduleMinute,
     events: items.map(({ event, weather }) => ({
       title: event.title,
       startTime: event.startTime.toISOString(),
       location: event.location.label,
-      weather: {
-        temp: weather.temperature,
-        rain: weather.rainProbability,
-        wind: weather.windSpeed,
-        isBad: weather.isBad,
-      },
+      weather: { temp: weather.temperature, rain: weather.rainProbability, wind: weather.windSpeed, isBad: weather.isBad },
     })),
     message,
   });
