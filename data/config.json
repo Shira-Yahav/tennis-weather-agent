@@ -9,5 +9,5 @@
     "footerBad": "⚠️ <b>Weather is not ideal. Consider cancelling or rescheduling.</b>"
   },
   "windThreshold": 21,
-  "rainThreshold": 2
+  "rainThreshold": 3
 }
