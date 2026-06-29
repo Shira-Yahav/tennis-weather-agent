@@ -319,24 +319,24 @@ export default function Dashboard() {
       <div className="h-screen flex flex-col bg-[#F0F7EC] font-sans overflow-hidden">
 
         {/* Header */}
-        <header className="bg-[#1B6B2C] text-white px-6 py-3.5 flex items-center justify-between shadow-lg flex-shrink-0">
+        <header className="bg-[#4A7C59] text-white px-6 py-3.5 flex items-center justify-between shadow-md flex-shrink-0">
           <div className="flex items-center gap-3">
             <span className="text-2xl">🎾</span>
             <div>
               <h1 className="text-base font-bold tracking-tight leading-tight">Tennis Weather Agent</h1>
-              <p className="text-green-300 text-[11px]">Dashboard & Control Panel</p>
+              <p className="text-[#B8D4C0] text-[11px]">Dashboard & Control Panel</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             {lastRefresh && (
-              <span className="text-green-300 text-xs flex items-center gap-1.5">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-[#B8D4C0] text-xs flex items-center gap-1.5">
+                <span className="w-2 h-2 bg-[#A8C99A] rounded-full animate-pulse" />
                 {lastRefresh.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
               </span>
             )}
             <button
               onClick={() => loadEvents(dashboardDays)}
-              className="p-2 rounded-lg bg-green-700 hover:bg-green-600 transition-colors"
+              className="p-2 rounded-lg bg-[#3D6B4A] hover:bg-[#345E40] transition-colors"
               title="Refresh calendar"
             >
               <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
