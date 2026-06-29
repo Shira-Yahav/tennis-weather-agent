@@ -99,11 +99,17 @@ Open-Meteo's free hourly forecast API is queried for the exact hour of each sess
 
 ## Screenshots
 
-> *Dashboard overview with upcoming events and Google Maps*
+### Dashboard — upcoming events with live weather, Google Maps, and activity log
+![Dashboard overview](public/screenshots/dashboard.png)
 
-> *Telegram message example with multi-event forecast*
+### Event selected — map pins to venue, weather strip updates to event forecast
+![Event selected](public/screenshots/event-selected.png)
 
-> *Settings panel — threshold configuration and schedule*
+### Settings — configurable bad weather thresholds and scheduled send time
+![Settings panel](public/screenshots/settings.png)
+
+### Telegram — automated daily briefing delivered to your phone
+![Telegram message](public/screenshots/telegram.png)
 
 ---
 
