@@ -8,14 +8,20 @@ export async function GET() {
   return NextResponse.json(config);
 }
 
+function israelOffsetHours(): number {
+  // Pin to UTC noon so we never land on a DST boundary edge case.
+  // Format that fixed UTC moment in Israel time — the difference from 12 is the offset.
+  const utcNoon = new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 0, 0));
+  const israelHour = parseInt(
+    new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jerusalem", hour: "2-digit", hour12: false }).format(utcNoon),
+    10,
+  );
+  return israelHour - 12; // 3 in summer (IDT), 2 in winter (IST)
+}
+
 function israelToUtc(hour: number, minute: number): { utcHour: number; utcMinute: number } {
-  const now = new Date();
-  const israelStr = now.toLocaleString("en-US", { timeZone: "Asia/Jerusalem", hour: "numeric", minute: "numeric", hour12: false });
-  const utcStr = now.toLocaleString("en-US", { timeZone: "UTC", hour: "numeric", minute: "numeric", hour12: false });
-  const [ih] = israelStr.split(":").map(Number);
-  const [uh] = utcStr.split(":").map(Number);
-  const offsetHours = ih - uh;
-  const utcHour = ((hour - offsetHours) + 24) % 24;
+  const offset = israelOffsetHours();
+  const utcHour = ((hour - offset) + 24) % 24;
   return { utcHour, utcMinute: minute };
 }
 

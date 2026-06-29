@@ -1,6 +1,6 @@
 {
   "messageDaysForward": 1,
-  "scheduleHour": 16,
+  "scheduleHour": 17,
   "scheduleMinute": 0,
   "template": {
     "header": "🎾 <b>Tennis — {date}</b>",
