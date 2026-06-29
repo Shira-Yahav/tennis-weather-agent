@@ -81,10 +81,10 @@ function WeatherPanel({ w, label, startTime }: { w: EventWeather; label: string;
   const rainCls = w.rain >= 30 ? "text-red-600" : w.rain >= 15 ? "text-amber-600" : "text-emerald-600";
   const windCls = w.wind >= 20 ? "text-red-600" : w.wind >= 12 ? "text-amber-600" : "text-emerald-600";
   return (
-    <div className="border-t border-[#C5DDB8] bg-white px-6 py-4 flex-shrink-0">
+    <div className="border-t border-[#C2D9C2] bg-white px-6 py-4 flex-shrink-0">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <p className="text-[10px] text-[#5C7A5C] font-semibold uppercase tracking-widest">Weather at event time</p>
+          <p className="text-[10px] text-[#4D7257] font-semibold uppercase tracking-widest">Weather at event time</p>
           <p className="text-sm font-bold text-[#1A2B1A]">{label} · {fmtDate(startTime)}, {fmtTime(startTime)}</p>
         </div>
         {w.isBad
@@ -116,21 +116,21 @@ function WeatherPanel({ w, label, startTime }: { w: EventWeather; label: string;
 }
 
 function DigitalClockInput({ hour, minute, onChange }: { hour: number; minute: number; onChange: (h: number, m: number) => void }) {
-  const spinCls = "text-[#1B6B2C] hover:text-[#155523] hover:bg-[#E0EDD8] rounded p-0.5 transition-colors";
+  const spinCls = "text-[#1A8C40] hover:text-[#157835] hover:bg-[#DDE8DD] rounded p-0.5 transition-colors";
   return (
-    <div className="inline-flex items-center gap-1 bg-[#F0F7EC] border-2 border-[#C5DDB8] rounded-xl px-4 py-2 select-none">
+    <div className="inline-flex items-center gap-1 bg-[#F4F9F4] border-2 border-[#C2D9C2] rounded-xl px-4 py-2 select-none">
       <div className="flex flex-col items-center gap-0.5">
         <button onClick={() => onChange((hour + 1) % 24, minute)} className={spinCls}><ChevronUp size={13} /></button>
-        <span className="text-2xl font-bold font-mono text-[#1B6B2C] w-9 text-center leading-none">{pad(hour)}</span>
+        <span className="text-2xl font-bold font-mono text-[#1A8C40] w-9 text-center leading-none">{pad(hour)}</span>
         <button onClick={() => onChange((hour - 1 + 24) % 24, minute)} className={spinCls}><ChevronDown size={13} /></button>
       </div>
-      <span className="text-2xl font-bold text-[#1B6B2C] pb-0.5">:</span>
+      <span className="text-2xl font-bold text-[#1A8C40] pb-0.5">:</span>
       <div className="flex flex-col items-center gap-0.5">
         <button onClick={() => onChange(hour, (minute + 5) % 60)} className={spinCls}><ChevronUp size={13} /></button>
-        <span className="text-2xl font-bold font-mono text-[#1B6B2C] w-9 text-center leading-none">{pad(minute)}</span>
+        <span className="text-2xl font-bold font-mono text-[#1A8C40] w-9 text-center leading-none">{pad(minute)}</span>
         <button onClick={() => onChange(hour, (minute - 5 + 60) % 60)} className={spinCls}><ChevronDown size={13} /></button>
       </div>
-      <span className="text-[10px] text-[#5C7A5C] ml-1.5 self-center font-semibold">IL</span>
+      <span className="text-[10px] text-[#4D7257] ml-1.5 self-center font-semibold">IL</span>
     </div>
   );
 }
@@ -316,27 +316,27 @@ export default function Dashboard() {
 
   return (
     <Toast.Provider swipeDirection="right">
-      <div className="h-screen flex flex-col bg-[#F0F7EC] font-sans overflow-hidden">
+      <div className="h-screen flex flex-col bg-[#F4F9F4] font-sans overflow-hidden">
 
         {/* Header */}
-        <header className="bg-[#4A7C59] text-white px-6 py-3.5 flex items-center justify-between shadow-md flex-shrink-0">
+        <header className="bg-white px-6 py-3.5 flex items-center justify-between border-b border-[#DDE8DD] shadow-[0_1px_4px_rgba(0,0,0,0.06)] flex-shrink-0">
           <div className="flex items-center gap-3">
             <span className="text-2xl">🎾</span>
             <div>
-              <h1 className="text-base font-bold tracking-tight leading-tight">Tennis Weather Agent</h1>
-              <p className="text-[#B8D4C0] text-[11px]">Dashboard & Control Panel</p>
+              <h1 className="text-base font-bold tracking-tight leading-tight text-[#0D1F12]">Tennis Weather Agent</h1>
+              <p className="text-[#5A7B62] text-[11px]">Dashboard & Control Panel</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             {lastRefresh && (
-              <span className="text-[#B8D4C0] text-xs flex items-center gap-1.5">
-                <span className="w-2 h-2 bg-[#A8C99A] rounded-full animate-pulse" />
+              <span className="text-[#5A7B62] text-xs flex items-center gap-1.5">
+                <span className="w-2 h-2 bg-[#1A8C40] rounded-full animate-pulse" />
                 {lastRefresh.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
               </span>
             )}
             <button
               onClick={() => loadEvents(dashboardDays)}
-              className="p-2 rounded-lg bg-[#3D6B4A] hover:bg-[#345E40] transition-colors"
+              className="p-2 rounded-lg bg-[#EEF5EE] hover:bg-[#DDE8DD] text-[#1A8C40] transition-colors"
               title="Refresh calendar"
             >
               <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
@@ -349,7 +349,7 @@ export default function Dashboard() {
               <button
                 onClick={doRun}
                 disabled={running || checkedIndices.size === 0 || weatherPending}
-                className="flex items-center gap-2 bg-[#D4E534] text-[#1B6B2C] font-bold px-4 py-2 rounded-lg hover:bg-[#c5d82e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm shadow"
+                className="flex items-center gap-2 bg-[#1A8C40] text-white font-bold px-4 py-2 rounded-lg hover:bg-[#157835] transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm shadow-sm"
               >
                 {running ? <RefreshCw size={13} className="animate-spin" />
                   : weatherPending ? <RefreshCw size={13} className="animate-spin" />
@@ -366,34 +366,34 @@ export default function Dashboard() {
         <div className="flex flex-1 overflow-hidden">
 
           {/* Left: events */}
-          <div className="w-80 flex-shrink-0 border-r border-[#C5DDB8] bg-white flex flex-col">
+          <div className="w-80 flex-shrink-0 border-r border-[#C2D9C2] bg-white flex flex-col">
             {/* Panel header */}
             <div className="px-4 pt-3 pb-2 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-2">
-                <Calendar size={15} className="text-[#1B6B2C]" />
+                <Calendar size={15} className="text-[#1A8C40]" />
                 <span className="font-semibold text-[#1A2B1A] text-sm">Upcoming Practices</span>
               </div>
               <div className="flex items-center gap-2">
                 {/* Select all toggle */}
                 {events.length > 0 && (
                   <button onClick={toggleAll} title={allChecked ? "Deselect all" : "Select all"}
-                    className="flex items-center gap-1 text-[#1B6B2C] hover:text-[#155523] transition-colors p-1 rounded hover:bg-[#F0F7EC]">
+                    className="flex items-center gap-1 text-[#1A8C40] hover:text-[#157835] transition-colors p-1 rounded hover:bg-[#F4F9F4]">
                     {allChecked ? <CheckSquare size={14} /> : <Square size={14} />}
                   </button>
                 )}
                 {/* Days filter */}
                 <Select.Root value={String(dashboardDays)} onValueChange={(v) => setDashboardDays(Number(v))}>
-                  <Select.Trigger className="flex items-center gap-1 text-[11px] text-[#1B6B2C] bg-[#F0F7EC] border border-[#C5DDB8] px-2 py-1 rounded-full font-semibold hover:bg-[#E0EDD8] transition-colors focus:outline-none">
+                  <Select.Trigger className="flex items-center gap-1 text-[11px] text-[#1A8C40] bg-[#F4F9F4] border border-[#C2D9C2] px-2 py-1 rounded-full font-semibold hover:bg-[#DDE8DD] transition-colors focus:outline-none">
                     <Select.Value />
                     <Select.Icon><ChevronDown size={10} /></Select.Icon>
                   </Select.Trigger>
                   <Select.Portal>
-                    <Select.Content className="bg-white border border-[#C5DDB8] rounded-xl shadow-xl z-50 overflow-hidden">
+                    <Select.Content className="bg-white border border-[#C2D9C2] rounded-xl shadow-xl z-50 overflow-hidden">
                       <Select.Viewport className="p-1">
                         {DASHBOARD_DAY_OPTIONS.map(d => (
-                          <Select.Item key={d} value={String(d)} className="flex items-center gap-2 px-3 py-2 text-xs text-[#1A2B1A] rounded-lg cursor-pointer hover:bg-[#F0F7EC] focus:outline-none data-[highlighted]:bg-[#F0F7EC]">
+                          <Select.Item key={d} value={String(d)} className="flex items-center gap-2 px-3 py-2 text-xs text-[#1A2B1A] rounded-lg cursor-pointer hover:bg-[#F4F9F4] focus:outline-none data-[highlighted]:bg-[#F4F9F4]">
                             <Select.ItemText>Next {d}d</Select.ItemText>
-                            <Select.ItemIndicator><Check size={11} className="text-[#1B6B2C]" /></Select.ItemIndicator>
+                            <Select.ItemIndicator><Check size={11} className="text-[#1A8C40]" /></Select.ItemIndicator>
                           </Select.Item>
                         ))}
                       </Select.Viewport>
@@ -402,23 +402,23 @@ export default function Dashboard() {
                 </Select.Root>
               </div>
             </div>
-            <Separator.Root className="bg-[#E0EDD8] h-px flex-shrink-0" />
+            <Separator.Root className="bg-[#DDE8DD] h-px flex-shrink-0" />
 
             <ScrollArea.Root className="flex-1 overflow-hidden">
               <ScrollArea.Viewport className="h-full w-full">
                 {loading ? (
-                  <div className="flex items-center justify-center h-32 text-[#5C7A5C] text-sm">
+                  <div className="flex items-center justify-center h-32 text-[#4D7257] text-sm">
                     <RefreshCw size={15} className="animate-spin mr-2" />Loading...
                   </div>
                 ) : events.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-32 text-[#5C7A5C] text-sm gap-2 p-4 text-center">
-                    <Calendar size={28} className="text-[#C5DDB8]" />
+                  <div className="flex flex-col items-center justify-center h-32 text-[#4D7257] text-sm gap-2 p-4 text-center">
+                    <Calendar size={28} className="text-[#C2D9C2]" />
                     No tennis events in the next {dashboardDays} days
                   </div>
                 ) : (
                   <div className="p-3 space-y-2">
                     {events.map((event, i) => (
-                      <div key={i} className={`rounded-xl border-2 transition-all duration-150 ${selected === event ? "border-[#1B6B2C] bg-[#F0F7EC] shadow-md" : "border-[#E0EDD8] bg-white hover:border-[#A8C99A] hover:bg-[#F8FCF5]"}`}>
+                      <div key={i} className={`rounded-xl border-2 transition-all duration-150 ${selected === event ? "border-[#1A8C40] bg-[#F0FAF2] shadow-md" : "border-[#DDE8DD] bg-white hover:border-[#8DC48D] hover:bg-[#F6FAF6]"}`}>
                         <div className="flex items-start gap-2 p-3">
                           {/* Checkbox */}
                           <Checkbox.Root
@@ -428,7 +428,7 @@ export default function Dashboard() {
                               next.has(i) ? next.delete(i) : next.add(i);
                               return next;
                             })}
-                            className="w-4 h-4 rounded border-2 border-[#1B6B2C] bg-white flex-shrink-0 mt-0.5 flex items-center justify-center data-[state=checked]:bg-[#1B6B2C] focus:outline-none"
+                            className="w-4 h-4 rounded border-2 border-[#1A8C40] bg-white flex-shrink-0 mt-0.5 flex items-center justify-center data-[state=checked]:bg-[#1A8C40] focus:outline-none"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <Checkbox.Indicator><Check size={10} className="text-white" /></Checkbox.Indicator>
@@ -437,26 +437,26 @@ export default function Dashboard() {
                           {/* Event card (clickable → map) */}
                           <button className="flex-1 text-left min-w-0" onClick={() => setSelected(s => s === event ? null : event)}>
                             <div className="flex items-start justify-between gap-2 mb-1.5">
-                              <span className="text-[#1B6B2C] font-bold text-sm">{fmtDate(event.startTime)}</span>
+                              <span className="text-[#1A8C40] font-bold text-sm">{fmtDate(event.startTime)}</span>
                               {event.weather
                                 ? <WeatherBadge w={event.weather} />
                                 : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-gray-100 text-gray-500"><RefreshCw size={9} className="animate-spin" />Weather…</span>}
                             </div>
                             <p className="text-[#1A2B1A] font-semibold text-xs leading-tight line-clamp-2 mb-2">{event.title}</p>
-                            <div className="flex items-center gap-1 text-xs text-[#5C7A5C] mb-1">
+                            <div className="flex items-center gap-1 text-xs text-[#4D7257] mb-1">
                               <Clock size={10} />{fmtTime(event.startTime)}–{fmtTime(event.endTime)}
                             </div>
-                            <div className="flex items-center gap-1 text-xs text-[#5C7A5C]">
+                            <div className="flex items-center gap-1 text-xs text-[#4D7257]">
                               <MapPin size={10} /><span className="truncate">{event.location.label}</span>
                             </div>
                             {event.weather && (
-                              <div className="flex items-center gap-3 mt-2 text-xs text-[#5C7A5C]">
+                              <div className="flex items-center gap-3 mt-2 text-xs text-[#4D7257]">
                                 <span className="flex items-center gap-0.5"><Thermometer size={10} className="text-orange-400" />{event.weather.temp}°C</span>
                                 <span className="flex items-center gap-0.5"><Droplets size={10} className="text-blue-400" />{event.weather.rain}%</span>
                                 <span className="flex items-center gap-0.5"><Wind size={10} className="text-slate-400" />{event.weather.wind} km/h</span>
                               </div>
                             )}
-                            {selected === event && <p className="text-[10px] text-[#1B6B2C] font-semibold mt-1.5 flex items-center gap-0.5"><ChevronRight size={10} />Showing on map</p>}
+                            {selected === event && <p className="text-[10px] text-[#1A8C40] font-semibold mt-1.5 flex items-center gap-0.5"><ChevronRight size={10} />Showing on map</p>}
                           </button>
                         </div>
                       </div>
@@ -465,7 +465,7 @@ export default function Dashboard() {
                 )}
               </ScrollArea.Viewport>
               <ScrollArea.Scrollbar orientation="vertical" className="w-1.5 bg-transparent p-px">
-                <ScrollArea.Thumb className="bg-[#C5DDB8] rounded-full" />
+                <ScrollArea.Thumb className="bg-[#C2D9C2] rounded-full" />
               </ScrollArea.Scrollbar>
             </ScrollArea.Root>
           </div>
@@ -484,10 +484,10 @@ export default function Dashboard() {
                   defaultView={!selected}
                 />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-[#F0F7EC] text-[#5C7A5C]">
-                  <MapPin size={44} className="text-[#C5DDB8] mb-3" />
+                <div className="w-full h-full flex flex-col items-center justify-center bg-[#F4F9F4] text-[#4D7257]">
+                  <MapPin size={44} className="text-[#C2D9C2] mb-3" />
                   <p className="font-semibold text-sm">Waiting for location…</p>
-                  <p className="text-xs mt-1 text-[#A8C99A]">Allow location access to see the map</p>
+                  <p className="text-xs mt-1 text-[#8DC48D]">Allow location access to see the map</p>
                 </div>
               )}
             </div>
@@ -502,13 +502,13 @@ export default function Dashboard() {
               const windCls = (v: number) => v >= config.windThreshold ? "text-red-500" : v >= config.windThreshold * 0.6 ? "text-amber-500" : "text-emerald-600";
 
               return (
-                <div className="flex-shrink-0 border-t border-[#E0EDD8] bg-[#F8FCF5] px-4 py-2 flex items-center gap-4 text-xs">
-                  <span className="text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider whitespace-nowrap">
+                <div className="flex-shrink-0 border-t border-[#DDE8DD] bg-[#F6FAF6] px-4 py-2 flex items-center gap-4 text-xs">
+                  <span className="text-[10px] font-bold text-[#4D7257] uppercase tracking-wider whitespace-nowrap">
                     {selected ? "Event" : "Now"}
                   </span>
 
                   {isLoading ? (
-                    <RefreshCw size={12} className="animate-spin text-[#5C7A5C]" />
+                    <RefreshCw size={12} className="animate-spin text-[#4D7257]" />
                   ) : w ? (
                     <>
                       <span className={`flex items-center gap-1 font-semibold ${w.isBad ? "text-red-600" : "text-emerald-600"}`}>
@@ -526,32 +526,32 @@ export default function Dashboard() {
                       </span>
                     </>
                   ) : (
-                    <span className="text-[#A8C99A]">{selected ? "Loading…" : "Allow location access"}</span>
+                    <span className="text-[#8DC48D]">{selected ? "Loading…" : "Allow location access"}</span>
                   )}
 
                   <span className="ml-auto flex items-center gap-2">
                     {selected && (
-                      <button onClick={() => setSelected(null)} className="flex items-center gap-1 text-[10px] font-semibold text-[#5C7A5C] hover:text-[#1B6B2C] border border-[#C5DDB8] rounded-full px-2 py-0.5 hover:border-[#1B6B2C] transition-colors">
+                      <button onClick={() => setSelected(null)} className="flex items-center gap-1 text-[10px] font-semibold text-[#4D7257] hover:text-[#1A8C40] border border-[#C2D9C2] rounded-full px-2 py-0.5 hover:border-[#1A8C40] transition-colors">
                         <MapPin size={9} /> My location
                       </button>
                     )}
-                    <span className="text-[#5C7A5C] truncate max-w-[180px]">{label} · {timeLabel}</span>
+                    <span className="text-[#4D7257] truncate max-w-[180px]">{label} · {timeLabel}</span>
                   </span>
                 </div>
               );
             })()}
 
             {/* Tabs */}
-            <div className="flex-shrink-0 border-t border-[#C5DDB8] bg-white" style={{ height: 320 }}>
+            <div className="flex-shrink-0 border-t border-[#C2D9C2] bg-white" style={{ height: 320 }}>
               <Tabs.Root defaultValue="logs" className="h-full flex flex-col">
-                <Tabs.List className="flex border-b border-[#E0EDD8] px-4 bg-[#F8FCF5] flex-shrink-0">
+                <Tabs.List className="flex border-b border-[#DDE8DD] px-4 bg-[#F6FAF6] flex-shrink-0">
                   {[
                     { value: "logs", icon: <Zap size={13} />, label: "Message Log" },
                     { value: "template", icon: <FileText size={13} />, label: "Message Template" },
                     { value: "settings", icon: <Settings size={13} />, label: "Settings" },
                   ].map((tab) => (
                     <Tabs.Trigger key={tab.value} value={tab.value}
-                      className="flex items-center gap-1.5 px-4 py-2.5 text-xs text-[#5C7A5C] font-semibold border-b-2 border-transparent data-[state=active]:border-[#1B6B2C] data-[state=active]:text-[#1B6B2C] transition-colors"
+                      className="flex items-center gap-1.5 px-4 py-2.5 text-xs text-[#4D7257] font-semibold border-b-2 border-transparent data-[state=active]:border-[#1A8C40] data-[state=active]:text-[#1A8C40] transition-colors"
                     >{tab.icon}{tab.label}</Tabs.Trigger>
                   ))}
                 </Tabs.List>
@@ -561,15 +561,15 @@ export default function Dashboard() {
                   <ScrollArea.Root className="h-full">
                     <ScrollArea.Viewport className="h-full p-3">
                       {logs.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-36 text-[#5C7A5C] text-xs gap-2">
-                          <MessageSquare size={20} className="text-[#C5DDB8]" />
+                        <div className="flex flex-col items-center justify-center h-36 text-[#4D7257] text-xs gap-2">
+                          <MessageSquare size={20} className="text-[#C2D9C2]" />
                           No messages logged yet. Hit &quot;Send&quot; to send your first one.
                         </div>
                       ) : (
                         <div className="space-y-1.5">
                           {logs.map((log) => (
-                            <div key={log.id} className="border border-[#E0EDD8] rounded-xl overflow-hidden">
-                              <button className="w-full text-left px-3 py-2 flex items-center justify-between hover:bg-[#F8FCF5] transition-colors"
+                            <div key={log.id} className="border border-[#DDE8DD] rounded-xl overflow-hidden">
+                              <button className="w-full text-left px-3 py-2 flex items-center justify-between hover:bg-[#F6FAF6] transition-colors"
                                 onClick={() => setExpandedLog(expandedLog === log.id ? null : log.id)}>
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${log.status === "success" ? "bg-emerald-500" : "bg-red-500"}`} />
@@ -580,17 +580,17 @@ export default function Dashboard() {
                                     {log.selectedEvents ?? log.eventsCount} event{(log.selectedEvents ?? log.eventsCount) !== 1 ? "s" : ""} sent
                                   </span>
                                   {log.daysForward !== undefined && (
-                                    <span className="text-[10px] text-[#5C7A5C]">· {log.daysForward}d lookhead</span>
+                                    <span className="text-[10px] text-[#4D7257]">· {log.daysForward}d lookhead</span>
                                   )}
                                   {log.status === "failure" && <span className="text-[10px] text-red-600 font-semibold">· Failed</span>}
                                 </div>
-                                <span className="text-[10px] text-[#5C7A5C] flex-shrink-0 ml-2">
+                                <span className="text-[10px] text-[#4D7257] flex-shrink-0 ml-2">
                                   {new Date(log.timestamp).toLocaleString("en-GB", { timeZone: "Asia/Jerusalem", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                                 </span>
                               </button>
                               {expandedLog === log.id && (
-                                <div className="border-t border-[#E0EDD8] bg-[#F8FCF5] px-3 py-2 space-y-1">
-                                  <div className="flex gap-4 text-[10px] text-[#5C7A5C] mb-1">
+                                <div className="border-t border-[#DDE8DD] bg-[#F6FAF6] px-3 py-2 space-y-1">
+                                  <div className="flex gap-4 text-[10px] text-[#4D7257] mb-1">
                                     <span>Schedule: {pad(log.scheduleHour ?? 16)}:{pad(log.scheduleMinute ?? 0)} IL</span>
                                     <span>Lookhead: {log.daysForward ?? 1}d</span>
                                     <span>Total events: {log.eventsCount}</span>
@@ -599,13 +599,13 @@ export default function Dashboard() {
                                     <div key={i} className="flex items-center gap-2 text-[10px] text-[#1A2B1A]">
                                       <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${e.weather?.isBad ? "bg-red-500" : "bg-emerald-500"}`} />
                                       <span className="font-semibold">{e.title}</span>
-                                      <span className="text-[#5C7A5C]">· {fmtTime(e.startTime)} · {e.location}</span>
-                                      {e.weather && <span className="text-[#5C7A5C]">· {e.weather.temp}°C, {e.weather.rain}% rain, {e.weather.wind} km/h</span>}
+                                      <span className="text-[#4D7257]">· {fmtTime(e.startTime)} · {e.location}</span>
+                                      {e.weather && <span className="text-[#4D7257]">· {e.weather.temp}°C, {e.weather.rain}% rain, {e.weather.wind} km/h</span>}
                                     </div>
                                   ))}
                                   {log.error && <p className="text-[10px] text-red-600 font-medium">Error: {log.error}</p>}
                                   {log.message && (
-                                    <pre className="text-[10px] text-[#1A2B1A] whitespace-pre-wrap bg-white border border-[#E0EDD8] rounded-lg p-2 mt-1 max-h-20 overflow-y-auto">{log.message}</pre>
+                                    <pre className="text-[10px] text-[#1A2B1A] whitespace-pre-wrap bg-white border border-[#DDE8DD] rounded-lg p-2 mt-1 max-h-20 overflow-y-auto">{log.message}</pre>
                                   )}
                                 </div>
                               )}
@@ -621,9 +621,9 @@ export default function Dashboard() {
                 <Tabs.Content value="template" className="flex-1 overflow-hidden">
                   <div className="flex h-full">
                     {/* Editors */}
-                    <div className="flex-1 overflow-y-auto border-r border-[#E0EDD8] p-3 space-y-2">
+                    <div className="flex-1 overflow-y-auto border-r border-[#DDE8DD] p-3 space-y-2">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] text-[#5C7A5C]">Edit fields below — changes auto-save</span>
+                          <span className="text-[10px] text-[#4D7257]">Edit fields below — changes auto-save</span>
                           {templateSaved
                             ? <span className="text-[10px] text-emerald-600 flex items-center gap-1"><CheckCircle2 size={10} />Saved</span>
                             : <span className="text-[10px] text-amber-600">Saving…</span>}
@@ -637,35 +637,35 @@ export default function Dashboard() {
                           };
                           return (
                             <div key={field}>
-                              <label className="block text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-1">{labels[field]}</label>
+                              <label className="block text-[10px] font-bold text-[#4D7257] uppercase tracking-wider mb-1">{labels[field]}</label>
                               <textarea rows={field === "eventBlock" ? 4 : 2}
                                 value={config.template[field]}
                                 onChange={(e) => updateTemplate(field, e.target.value)}
-                                className="w-full rounded-lg border border-[#C5DDB8] p-2 text-xs font-mono text-[#1A2B1A] bg-[#F8FCF5] focus:outline-none focus:ring-2 focus:ring-[#1B6B2C] resize-none"
+                                className="w-full rounded-lg border border-[#C2D9C2] p-2 text-xs font-mono text-[#1A2B1A] bg-[#F6FAF6] focus:outline-none focus:ring-2 focus:ring-[#1A8C40] resize-none"
                               />
                             </div>
                           );
                         })}
                         <button onClick={() => { saveConfig({ template: DEFAULT_TEMPLATE }); setTemplateSaved(true); }}
-                          className="text-[10px] text-[#5C7A5C] underline hover:text-[#1B6B2C]">Reset to default</button>
+                          className="text-[10px] text-[#4D7257] underline hover:text-[#1A8C40]">Reset to default</button>
                     </div>
 
                     {/* Variables */}
-                    <div className="w-36 flex-shrink-0 border-r border-[#E0EDD8] p-2 overflow-auto bg-[#F8FCF5]">
-                      <p className="text-[9px] font-bold text-[#1B6B2C] uppercase tracking-wider mb-1.5">Variables</p>
+                    <div className="w-36 flex-shrink-0 border-r border-[#DDE8DD] p-2 overflow-auto bg-[#F6FAF6]">
+                      <p className="text-[9px] font-bold text-[#1A8C40] uppercase tracking-wider mb-1.5">Variables</p>
                       {TEMPLATE_VARS.map(({ key, desc }) => (
                         <div key={key} className="mb-1.5">
-                          <code className="text-[9px] bg-white border border-[#C5DDB8] px-1 py-0.5 rounded font-mono text-[#1B6B2C] block">{key}</code>
-                          <span className="text-[9px] text-[#5C7A5C] leading-tight">{desc}</span>
+                          <code className="text-[9px] bg-white border border-[#C2D9C2] px-1 py-0.5 rounded font-mono text-[#1A8C40] block">{key}</code>
+                          <span className="text-[9px] text-[#4D7257] leading-tight">{desc}</span>
                         </div>
                       ))}
-                      <p className="text-[9px] text-[#5C7A5C] mt-2 border-t border-[#E0EDD8] pt-2">Use <code className="bg-white border border-[#C5DDB8] px-0.5 rounded">&lt;b&gt;</code> for bold</p>
+                      <p className="text-[9px] text-[#4D7257] mt-2 border-t border-[#DDE8DD] pt-2">Use <code className="bg-white border border-[#C2D9C2] px-0.5 rounded">&lt;b&gt;</code> for bold</p>
                     </div>
 
                     {/* Live preview */}
                     <div className="w-56 flex-shrink-0 p-2 overflow-auto bg-white">
-                      <p className="text-[9px] font-bold text-[#1B6B2C] uppercase tracking-wider mb-1.5">Preview {events.length === 0 && "(no events)"}</p>
-                      <pre className="text-[10px] text-[#1A2B1A] whitespace-pre-wrap font-mono leading-relaxed bg-[#F8FCF5] rounded-lg border border-[#E0EDD8] p-2">
+                      <p className="text-[9px] font-bold text-[#1A8C40] uppercase tracking-wider mb-1.5">Preview {events.length === 0 && "(no events)"}</p>
+                      <pre className="text-[10px] text-[#1A2B1A] whitespace-pre-wrap font-mono leading-relaxed bg-[#F6FAF6] rounded-lg border border-[#DDE8DD] p-2">
                         {(() => {
                           const ev = events[0];
                           if (!ev) return "Load calendar events to see a preview here.";
@@ -698,19 +698,19 @@ export default function Dashboard() {
 
                 {/* Settings */}
                 <Tabs.Content value="settings" className="flex-1 overflow-auto">
-                  <div className="flex h-full divide-x divide-[#E0EDD8]">
+                  <div className="flex h-full divide-x divide-[#DDE8DD]">
 
                     {/* Bad weather thresholds */}
                     <div className="flex-1 p-4 space-y-4">
                       <div>
-                        <p className="text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider mb-3">Bad weather thresholds</p>
-                        <p className="text-[10px] text-[#5C7A5C] mb-3">Weather is flagged as bad if wind OR rain exceeds these values.</p>
+                        <p className="text-[10px] font-bold text-[#4D7257] uppercase tracking-wider mb-3">Bad weather thresholds</p>
+                        <p className="text-[10px] text-[#4D7257] mb-3">Weather is flagged as bad if wind OR rain exceeds these values.</p>
                       </div>
 
                       {/* Wind */}
                       <div>
                         <label className="block text-xs font-semibold text-[#1A2B1A] mb-1.5 flex items-center gap-1.5">
-                          <Wind size={13} className="text-[#1B6B2C]" /> Wind speed threshold
+                          <Wind size={13} className="text-[#1A8C40]" /> Wind speed threshold
                         </label>
                         <div className="flex items-center gap-2">
                           <input type="number" min={1} max={100}
@@ -726,17 +726,17 @@ export default function Dashboard() {
                               const next = { ...config, windThreshold: v };
                               saveConfig(next);
                             }}
-                            className="w-20 rounded-lg border-2 border-[#C5DDB8] px-3 py-2 text-base font-bold text-[#1B6B2C] text-center bg-[#F0F7EC] focus:outline-none focus:border-[#1B6B2C]"
+                            className="w-20 rounded-lg border-2 border-[#C2D9C2] px-3 py-2 text-base font-bold text-[#1A8C40] text-center bg-[#F4F9F4] focus:outline-none focus:border-[#1A8C40]"
                           />
-                          <span className="text-sm text-[#5C7A5C]">km/h</span>
-                          <span className="text-[10px] text-[#5C7A5C] ml-1">Current: {config.windThreshold} km/h</span>
+                          <span className="text-sm text-[#4D7257]">km/h</span>
+                          <span className="text-[10px] text-[#4D7257] ml-1">Current: {config.windThreshold} km/h</span>
                         </div>
                       </div>
 
                       {/* Rain */}
                       <div>
                         <label className="block text-xs font-semibold text-[#1A2B1A] mb-1.5 flex items-center gap-1.5">
-                          <Droplets size={13} className="text-[#1B6B2C]" /> Rain probability threshold
+                          <Droplets size={13} className="text-[#1A8C40]" /> Rain probability threshold
                         </label>
                         <div className="flex items-center gap-2">
                           <input type="number" min={1} max={100}
@@ -752,38 +752,38 @@ export default function Dashboard() {
                               const next = { ...config, rainThreshold: v };
                               saveConfig(next);
                             }}
-                            className="w-20 rounded-lg border-2 border-[#C5DDB8] px-3 py-2 text-base font-bold text-[#1B6B2C] text-center bg-[#F0F7EC] focus:outline-none focus:border-[#1B6B2C]"
+                            className="w-20 rounded-lg border-2 border-[#C2D9C2] px-3 py-2 text-base font-bold text-[#1A8C40] text-center bg-[#F4F9F4] focus:outline-none focus:border-[#1A8C40]"
                           />
-                          <span className="text-sm text-[#5C7A5C]">%</span>
-                          <span className="text-[10px] text-[#5C7A5C] ml-1">Current: {config.rainThreshold}%</span>
+                          <span className="text-sm text-[#4D7257]">%</span>
+                          <span className="text-[10px] text-[#4D7257] ml-1">Current: {config.rainThreshold}%</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="w-px bg-[#E0EDD8]" />
+                    <div className="w-px bg-[#DDE8DD]" />
 
                     {/* Schedule */}
                     <div className="flex-1 p-4 space-y-4">
-                      <p className="text-[10px] font-bold text-[#5C7A5C] uppercase tracking-wider">Schedule</p>
+                      <p className="text-[10px] font-bold text-[#4D7257] uppercase tracking-wider">Schedule</p>
 
                       <div>
                         <label className="block text-xs font-semibold text-[#1A2B1A] mb-1.5 flex items-center gap-1.5">
-                          <Calendar size={13} className="text-[#1B6B2C]" /> Message lookhead
+                          <Calendar size={13} className="text-[#1A8C40]" /> Message lookhead
                         </label>
                         <div className="flex items-center gap-2">
                           <input type="number" min={1} max={30}
                             value={config.messageDaysForward}
                             onChange={(e) => saveConfig({ messageDaysForward: Math.max(1, Math.min(30, Number(e.target.value))) })}
-                            className="w-20 rounded-lg border-2 border-[#C5DDB8] px-3 py-2 text-base font-bold text-[#1B6B2C] text-center bg-[#F0F7EC] focus:outline-none focus:border-[#1B6B2C]"
+                            className="w-20 rounded-lg border-2 border-[#C2D9C2] px-3 py-2 text-base font-bold text-[#1A8C40] text-center bg-[#F4F9F4] focus:outline-none focus:border-[#1A8C40]"
                           />
-                          <span className="text-sm text-[#5C7A5C]">days ahead</span>
+                          <span className="text-sm text-[#4D7257]">days ahead</span>
                         </div>
-                        <p className="text-[10px] text-[#5C7A5C] mt-1">1 = tomorrow only</p>
+                        <p className="text-[10px] text-[#4D7257] mt-1">1 = tomorrow only</p>
                       </div>
 
                       <div>
                         <label className="block text-xs font-semibold text-[#1A2B1A] mb-1.5 flex items-center gap-1.5">
-                          <Clock size={13} className="text-[#1B6B2C]" /> Daily send time
+                          <Clock size={13} className="text-[#1A8C40]" /> Daily send time
                           {savingSchedule && <span className="text-amber-600 text-[10px] font-normal">saving…</span>}
                         </label>
                         <DigitalClockInput
@@ -791,7 +791,7 @@ export default function Dashboard() {
                           minute={config.scheduleMinute}
                           onChange={(h, m) => saveSchedule({ scheduleHour: h, scheduleMinute: m })}
                         />
-                        <p className="text-[10px] text-[#5C7A5C] mt-1">Israel time · triggers GitHub redeploy</p>
+                        <p className="text-[10px] text-[#4D7257] mt-1">Israel time · triggers GitHub redeploy</p>
                       </div>
                     </div>
                   </div>
@@ -803,7 +803,7 @@ export default function Dashboard() {
       </div>
 
       <Toast.Root open={toast.open} onOpenChange={(open) => setToast(t => ({ ...t, open }))} duration={4000}
-        className={`fixed bottom-5 right-5 z-50 rounded-xl shadow-xl px-4 py-3 flex items-center gap-3 text-sm font-semibold border ${toast.ok ? "bg-white border-[#C5DDB8] text-[#1B6B2C]" : "bg-white border-red-200 text-red-700"}`}>
+        className={`fixed bottom-5 right-5 z-50 rounded-xl shadow-xl px-4 py-3 flex items-center gap-3 text-sm font-semibold border ${toast.ok ? "bg-white border-[#C2D9C2] text-[#1A8C40]" : "bg-white border-red-200 text-red-700"}`}>
         {toast.ok ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
         <Toast.Description>{toast.message}</Toast.Description>
       </Toast.Root>
