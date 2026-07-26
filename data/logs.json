@@ -1,5 +1,41 @@
 [
   {
+    "id": "1785075875596",
+    "timestamp": "2026-07-26T14:24:35.596Z",
+    "manual": false,
+    "status": "success",
+    "eventsCount": 2,
+    "selectedEvents": 2,
+    "daysForward": 1,
+    "scheduleHour": 17,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "Tennis",
+        "startTime": "2026-07-26T14:45:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 29.8,
+          "rain": 0,
+          "wind": 15.9,
+          "isBad": true
+        }
+      },
+      {
+        "title": "Tennis",
+        "startTime": "2026-07-27T15:30:00.000Z",
+        "location": "Rokach Blvd 4, Tel Aviv-Yafo, Israel",
+        "weather": {
+          "temp": 30.6,
+          "rain": 0,
+          "wind": 16.1,
+          "isBad": true
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Sunday, 26 July 2026 – Monday, 27 July 2026</b>\n\n📅 <b>Sunday, 26 July 2026</b>\n<b>Tennis</b>\n🕐 17:45–18:45\n📍 Rokach 4, Tel Aviv\n🌡 29.8°C  🌧 Rain: 0%  💨 Wind: 15.9 km/h\n⚠️ Bad conditions\n\n📅 <b>Monday, 27 July 2026</b>\n<b>Tennis</b>\n🕐 18:30–20:30\n📍 Rokach Blvd 4, Tel Aviv-Yafo, Israel\n🌡 30.6°C  🌧 Rain: 0%  💨 Wind: 16.1 km/h\n⚠️ Bad conditions\n\n⚠️ <b>Weather is not ideal. Consider cancelling or rescheduling.</b>"
+  },
+  {
     "id": "1784731530554",
     "timestamp": "2026-07-22T14:45:30.554Z",
     "manual": false,
