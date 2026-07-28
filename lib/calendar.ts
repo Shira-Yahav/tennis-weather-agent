@@ -44,9 +44,7 @@ function toEnglishTitle(rawTitle: string, venueLabel: string): string {
 async function getLocationForEvent(title: string, locationField: string | null): Promise<LatLng> {
   if (isTennisEvent(title)) {
     if (locationField && locationField.trim()) {
-      const { geocodeVenue } = await import("./locations");
-      const result = await geocodeVenue(locationField.trim());
-      return result ?? DEFAULT_LOCATION;
+      return resolveLocation(locationField.trim());
     }
     return DEFAULT_LOCATION;
   }

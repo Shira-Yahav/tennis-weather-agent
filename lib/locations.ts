@@ -52,16 +52,29 @@ function buildEnglishLabel(result: { formatted_address: string; address_componen
   return parts.length > 0 ? parts.join(", ") : "Israel";
 }
 
+// Same address is requested repeatedly (dashboard polls every 60s, recurring
+// calendar events reuse the same location text) — memoize per warm instance
+// so we don't re-hit the paid API for something that never changes.
+const geocodeCache = new Map<string, LatLng | null>();
+
 export async function geocodeVenue(query: string): Promise<LatLng | null> {
+  const cacheKey = query.trim().toLowerCase();
+  if (geocodeCache.has(cacheKey)) return geocodeCache.get(cacheKey)!;
+
   const key = process.env.GOOGLE_GEOCODING_KEY;
   if (!key) return null;
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&language=en&region=il&key=${key}`;
   const res = await fetch(url, { cache: "no-store" });
   const data = await res.json();
-  if (data.status !== "OK" || !data.results[0]) return null;
+  if (data.status !== "OK" || !data.results[0]) {
+    geocodeCache.set(cacheKey, null);
+    return null;
+  }
   const { lat, lng } = data.results[0].geometry.location;
   const label = buildEnglishLabel(data.results[0]);
-  return { lat, lng, label };
+  const result = { lat, lng, label };
+  geocodeCache.set(cacheKey, result);
+  return result;
 }
 
 export async function resolveLocation(venueName: string): Promise<LatLng> {

@@ -157,6 +157,7 @@ export default function Dashboard() {
   const [templateSaved, setTemplateSaved] = useState(true);
   const scheduleDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const templateDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const thresholdDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Ref holds latest thresholds so loadEvents never has a stale closure over config
   const thresholdsRef = useRef({ wind: 20, rain: 30 });
   const dashboardDaysRef = useRef(dashboardDays);
@@ -190,6 +191,13 @@ export default function Dashboard() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Debounced so dragging/typing a threshold doesn't re-fetch (and re-geocode) on every tick
+  const loadEventsDebounced = useCallback((days?: number, wind?: number, rain?: number) => {
+    if (thresholdDebounce.current) clearTimeout(thresholdDebounce.current);
+    thresholdDebounce.current = setTimeout(() => loadEvents(days, wind, rain), 500);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const loadLogs = useCallback(async () => {
     try { const r = await fetch("/api/logs"); const d = await r.json(); setLogs(Array.isArray(d) ? d : []); } catch {}
   }, []);
@@ -210,7 +218,11 @@ export default function Dashboard() {
       loadLogs();
     };
     init();
-    const t = setInterval(() => loadEvents(), 60000);
+    // Skip refreshes while the tab is backgrounded — an open, unattended tab
+    // shouldn't keep re-fetching (and re-geocoding) every minute forever.
+    const t = setInterval(() => {
+      if (document.visibilityState === "visible") loadEvents();
+    }, 60000);
     return () => clearInterval(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -719,7 +731,7 @@ export default function Dashboard() {
                               const v = Math.max(1, Math.min(100, Number(e.target.value)));
                               setConfig(c => ({ ...c, windThreshold: v }));
                               thresholdsRef.current = { wind: v, rain: config.rainThreshold };
-                              loadEvents(dashboardDays, v, config.rainThreshold);
+                              loadEventsDebounced(dashboardDays, v, config.rainThreshold);
                             }}
                             onBlur={(e) => {
                               const v = Math.max(1, Math.min(100, Number(e.target.value)));
@@ -745,7 +757,7 @@ export default function Dashboard() {
                               const v = Math.max(1, Math.min(100, Number(e.target.value)));
                               setConfig(c => ({ ...c, rainThreshold: v }));
                               thresholdsRef.current = { wind: config.windThreshold, rain: v };
-                              loadEvents(dashboardDays, config.windThreshold, v);
+                              loadEventsDebounced(dashboardDays, config.windThreshold, v);
                             }}
                             onBlur={(e) => {
                               const v = Math.max(1, Math.min(100, Number(e.target.value)));
