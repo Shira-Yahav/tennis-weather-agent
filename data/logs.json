@@ -1,5 +1,30 @@
 [
   {
+    "id": "1786111902991",
+    "timestamp": "2026-08-07T14:11:42.991Z",
+    "manual": false,
+    "status": "success",
+    "eventsCount": 1,
+    "selectedEvents": 1,
+    "daysForward": 1,
+    "scheduleHour": 17,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "Tennis competition",
+        "startTime": "2026-08-08T14:00:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 31,
+          "rain": 0,
+          "wind": 15.9,
+          "isBad": true
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Saturday, 8 August 2026</b>\n\n<b>Tennis competition</b>\n🕐 17:00–20:00\n📍 Rokach 4, Tel Aviv\n🌡 31°C  🌧 Rain: 0%  💨 Wind: 15.9 km/h\n⚠️ Bad conditions\n\n⚠️ <b>Weather is not ideal. Consider cancelling or rescheduling.</b>"
+  },
+  {
     "id": "1785939848600",
     "timestamp": "2026-08-05T14:24:08.600Z",
     "manual": false,
