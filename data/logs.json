@@ -1,5 +1,30 @@
 [
   {
+    "id": "1786977344704",
+    "timestamp": "2026-08-17T14:35:44.704Z",
+    "manual": false,
+    "status": "success",
+    "eventsCount": 1,
+    "selectedEvents": 1,
+    "daysForward": 1,
+    "scheduleHour": 17,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "Tennis",
+        "startTime": "2026-08-17T15:30:00.000Z",
+        "location": "Rokach Blvd 4, Tel Aviv-Yafo, Israel",
+        "weather": {
+          "temp": 30.3,
+          "rain": 0,
+          "wind": 14.8,
+          "isBad": true
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Monday, 17 August 2026</b>\n\n<b>Tennis</b>\n🕐 18:30–20:30\n📍 Rokach Blvd 4, Tel Aviv-Yafo, Israel\n🌡 30.3°C  🌧 Rain: 0%  💨 Wind: 14.8 km/h\n⚠️ Bad conditions\n\n⚠️ <b>Weather is not ideal. Consider cancelling or rescheduling.</b>"
+  },
+  {
     "id": "1786888853864",
     "timestamp": "2026-08-16T14:00:53.864Z",
     "manual": false,
