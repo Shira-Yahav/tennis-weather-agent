@@ -1,5 +1,30 @@
 [
   {
+    "id": "1787322668293",
+    "timestamp": "2026-08-21T14:31:08.293Z",
+    "manual": false,
+    "status": "success",
+    "eventsCount": 1,
+    "selectedEvents": 1,
+    "daysForward": 1,
+    "scheduleHour": 17,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "Rokach 4, Tel Aviv — Court 7",
+        "startTime": "2026-08-21T15:00:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 31.1,
+          "rain": 0,
+          "wind": 14.4,
+          "isBad": true
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Friday, 21 August 2026</b>\n\n<b>Rokach 4, Tel Aviv — Court 7</b>\n🕐 18:00–19:00\n📍 Rokach 4, Tel Aviv\n🌡 31.1°C  🌧 Rain: 0%  💨 Wind: 14.4 km/h\n⚠️ Bad conditions\n\n⚠️ <b>Weather is not ideal. Consider cancelling or rescheduling.</b>"
+  },
+  {
     "id": "1787235395350",
     "timestamp": "2026-08-20T14:16:35.350Z",
     "manual": false,
