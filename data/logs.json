@@ -1,5 +1,41 @@
 [
   {
+    "id": "1788101863822",
+    "timestamp": "2026-08-30T14:57:43.822Z",
+    "manual": false,
+    "status": "success",
+    "eventsCount": 2,
+    "selectedEvents": 2,
+    "daysForward": 1,
+    "scheduleHour": 17,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "הרשמה לקורס Tennis בהנחה מסתיימת",
+        "startTime": "2026-08-30T07:10:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 26.1,
+          "rain": 0,
+          "wind": 4,
+          "isBad": false
+        }
+      },
+      {
+        "title": "Tennis",
+        "startTime": "2026-08-31T15:30:00.000Z",
+        "location": "Rokach Blvd 4, Tel Aviv-Yafo, Israel",
+        "weather": {
+          "temp": 30.5,
+          "rain": 0,
+          "wind": 14.7,
+          "isBad": true
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Sunday, 30 August 2026 – Monday, 31 August 2026</b>\n\n📅 <b>Sunday, 30 August 2026</b>\n<b>הרשמה לקורס Tennis בהנחה מסתיימת</b>\n🕐 10:10–15:10\n📍 Rokach 4, Tel Aviv\n🌡 26.1°C  🌧 Rain: 0%  💨 Wind: 4 km/h\n✅ Good conditions\n\n📅 <b>Monday, 31 August 2026</b>\n<b>Tennis</b>\n🕐 18:30–20:30\n📍 Rokach Blvd 4, Tel Aviv-Yafo, Israel\n🌡 30.5°C  🌧 Rain: 0%  💨 Wind: 14.7 km/h\n⚠️ Bad conditions\n\n⚠️ <b>Poor weather for: Tennis. Consider rescheduling those sessions.</b>"
+  },
+  {
     "id": "1788014912034",
     "timestamp": "2026-08-29T14:48:32.034Z",
     "manual": false,
