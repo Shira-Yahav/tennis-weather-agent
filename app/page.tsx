@@ -454,12 +454,12 @@ export default function Dashboard() {
                                 ? <WeatherBadge w={event.weather} />
                                 : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-gray-100 text-gray-500"><RefreshCw size={9} className="animate-spin" />Weather…</span>}
                             </div>
-                            <p className="text-[#1A2B1A] font-semibold text-xs leading-tight line-clamp-2 mb-2">{event.title}</p>
+                            <p className="text-[#1A2B1A] font-semibold text-xs leading-tight break-words mb-2">{event.title}</p>
                             <div className="flex items-center gap-1 text-xs text-[#4D7257] mb-1">
-                              <Clock size={10} />{fmtTime(event.startTime)}–{fmtTime(event.endTime)}
+                              <Clock size={10} className="flex-shrink-0" />{fmtTime(event.startTime)}–{fmtTime(event.endTime)}
                             </div>
-                            <div className="flex items-center gap-1 text-xs text-[#4D7257] min-w-0">
-                              <MapPin size={10} className="flex-shrink-0" /><span className="truncate min-w-0">{event.location.label}</span>
+                            <div className="flex items-start gap-1 text-xs text-[#4D7257] min-w-0">
+                              <MapPin size={10} className="flex-shrink-0 mt-0.5" /><span className="break-words min-w-0">{event.location.label}</span>
                             </div>
                             {event.weather && (
                               <div className="flex items-center gap-3 mt-2 text-xs text-[#4D7257]">
