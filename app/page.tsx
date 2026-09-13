@@ -458,8 +458,8 @@ export default function Dashboard() {
                             <div className="flex items-center gap-1 text-xs text-[#4D7257] mb-1">
                               <Clock size={10} />{fmtTime(event.startTime)}–{fmtTime(event.endTime)}
                             </div>
-                            <div className="flex items-center gap-1 text-xs text-[#4D7257]">
-                              <MapPin size={10} /><span className="truncate">{event.location.label}</span>
+                            <div className="flex items-center gap-1 text-xs text-[#4D7257] min-w-0">
+                              <MapPin size={10} className="flex-shrink-0" /><span className="truncate min-w-0">{event.location.label}</span>
                             </div>
                             {event.weather && (
                               <div className="flex items-center gap-3 mt-2 text-xs text-[#4D7257]">
