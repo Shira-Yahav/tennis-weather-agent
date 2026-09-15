@@ -1,5 +1,30 @@
 [
   {
+    "id": "1789482786888",
+    "timestamp": "2026-09-15T14:33:06.888Z",
+    "manual": false,
+    "status": "success",
+    "eventsCount": 1,
+    "selectedEvents": 1,
+    "daysForward": 1,
+    "scheduleHour": 17,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "Crete Tennis Camp",
+        "startTime": "2026-09-15T09:00:00.000Z",
+        "location": "Nana Golden Beach, Chersonisos 700 14, Greece",
+        "weather": {
+          "temp": 23.4,
+          "rain": 0,
+          "wind": 5.8,
+          "isBad": false
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Tuesday, 15 September 2026</b>\n\n<b>Crete Tennis Camp</b>\n🕐 12:00–13:00\n📍 Nana Golden Beach, Chersonisos 700 14, Greece\n🌡 23.4°C  🌧 Rain: 0%  💨 Wind: 5.8 km/h\n✅ Good conditions\n\nAll clear — enjoy your game! 🎾"
+  },
+  {
     "id": "1789396386352",
     "timestamp": "2026-09-14T14:33:06.352Z",
     "manual": false,
