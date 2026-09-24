@@ -1,5 +1,52 @@
 [
   {
+    "id": "1790260384874",
+    "timestamp": "2026-09-24T14:33:04.874Z",
+    "manual": false,
+    "status": "success",
+    "eventsCount": 3,
+    "selectedEvents": 3,
+    "daysForward": 1,
+    "scheduleHour": 17,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "Tennis Competition - Rockach 73",
+        "startTime": "2026-09-25T00:00:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 25.1,
+          "rain": 8,
+          "wind": 5.9,
+          "isBad": false
+        }
+      },
+      {
+        "title": "Tero הוד השרון - Tennis 1",
+        "startTime": "2026-09-25T07:00:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 24.4,
+          "rain": 3,
+          "wind": 3.6,
+          "isBad": false
+        }
+      },
+      {
+        "title": "Tero הוד השרון - Tennis 1",
+        "startTime": "2026-09-25T08:00:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 25.2,
+          "rain": 3,
+          "wind": 4.3,
+          "isBad": false
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Friday, 25 September 2026</b>\n\n<b>Tennis Competition - Rockach 73</b>\n🕐 03:00–03:00\n📍 Rokach 4, Tel Aviv\n🌡 25.1°C  🌧 Rain: 8%  💨 Wind: 5.9 km/h\n✅ Good conditions\n\n<b>Tero הוד השרון - Tennis 1</b>\n🕐 10:00–11:00\n📍 Rokach 4, Tel Aviv\n🌡 24.4°C  🌧 Rain: 3%  💨 Wind: 3.6 km/h\n✅ Good conditions\n\n<b>Tero הוד השרון - Tennis 1</b>\n🕐 11:00–12:00\n📍 Rokach 4, Tel Aviv\n🌡 25.2°C  🌧 Rain: 3%  💨 Wind: 4.3 km/h\n✅ Good conditions\n\nAll clear — enjoy your game! 🎾"
+  },
+  {
     "id": "1790251033805",
     "timestamp": "2026-09-24T11:57:13.805Z",
     "manual": true,
