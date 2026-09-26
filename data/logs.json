@@ -1,5 +1,41 @@
 [
   {
+    "id": "1790433184179",
+    "timestamp": "2026-09-26T14:33:04.179Z",
+    "manual": false,
+    "status": "success",
+    "eventsCount": 2,
+    "selectedEvents": 2,
+    "daysForward": 1,
+    "scheduleHour": 17,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "Tennis Competition - Rockach 73",
+        "startTime": "2026-09-25T00:00:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 25.9,
+          "rain": 0,
+          "wind": 6,
+          "isBad": false
+        }
+      },
+      {
+        "title": "Tennis",
+        "startTime": "2026-09-27T15:00:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 27.9,
+          "rain": 0,
+          "wind": 11.4,
+          "isBad": false
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Friday, 25 September 2026 – Sunday, 27 September 2026</b>\n\n📅 <b>Friday, 25 September 2026</b>\n<b>Tennis Competition - Rockach 73</b>\n🕐 03:00–03:00\n📍 Rokach 4, Tel Aviv\n🌡 25.9°C  🌧 Rain: 0%  💨 Wind: 6 km/h\n✅ Good conditions\n\n📅 <b>Sunday, 27 September 2026</b>\n<b>Tennis</b>\n🕐 18:00–19:00\n📍 Rokach 4, Tel Aviv\n🌡 27.9°C  🌧 Rain: 0%  💨 Wind: 11.4 km/h\n✅ Good conditions\n\nAll clear — enjoy your game! 🎾"
+  },
+  {
     "id": "1790346784782",
     "timestamp": "2026-09-25T14:33:04.782Z",
     "manual": false,
