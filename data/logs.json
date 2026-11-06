@@ -1,5 +1,30 @@
 [
   {
+    "id": "1793975584514",
+    "timestamp": "2026-11-06T14:33:04.514Z",
+    "manual": false,
+    "status": "success",
+    "eventsCount": 1,
+    "selectedEvents": 1,
+    "daysForward": 1,
+    "scheduleHour": 17,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "Tennis instructors course",
+        "startTime": "2026-11-06T06:00:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 17.6,
+          "rain": 8,
+          "wind": 2.9,
+          "isBad": false
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Friday, 6 November 2026</b>\n\n<b>Tennis instructors course</b>\n🕐 08:00–15:00\n📍 Rokach 4, Tel Aviv\n🌡 17.6°C  🌧 Rain: 8%  💨 Wind: 2.9 km/h\n✅ Good conditions\n\nAll clear — enjoy your game! 🎾"
+  },
+  {
     "id": "1793889185885",
     "timestamp": "2026-11-05T14:33:05.885Z",
     "manual": false,
