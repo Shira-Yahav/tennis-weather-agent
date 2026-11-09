@@ -1,5 +1,41 @@
 [
   {
+    "id": "1794234787699",
+    "timestamp": "2026-11-09T14:33:07.699Z",
+    "manual": false,
+    "status": "success",
+    "eventsCount": 2,
+    "selectedEvents": 2,
+    "daysForward": 1,
+    "scheduleHour": 17,
+    "scheduleMinute": 0,
+    "events": [
+      {
+        "title": "Tennis",
+        "startTime": "2026-11-09T16:30:00.000Z",
+        "location": "Rokach Blvd 4, Tel Aviv-Yafo, Israel",
+        "weather": {
+          "temp": 20,
+          "rain": 0,
+          "wind": 11.9,
+          "isBad": false
+        }
+      },
+      {
+        "title": "לבטל Tennis",
+        "startTime": "2026-11-10T08:00:00.000Z",
+        "location": "Rokach 4, Tel Aviv",
+        "weather": {
+          "temp": 13,
+          "rain": 0,
+          "wind": 3.2,
+          "isBad": false
+        }
+      }
+    ],
+    "message": "🎾 <b>Tennis — Monday, 9 November 2026 – Tuesday, 10 November 2026</b>\n\n📅 <b>Monday, 9 November 2026</b>\n<b>Tennis</b>\n🕐 18:30–20:30\n📍 Rokach Blvd 4, Tel Aviv-Yafo, Israel\n🌡 20°C  🌧 Rain: 0%  💨 Wind: 11.9 km/h\n✅ Good conditions\n\n📅 <b>Tuesday, 10 November 2026</b>\n<b>לבטל Tennis</b>\n🕐 10:00–11:00\n📍 Rokach 4, Tel Aviv\n🌡 13°C  🌧 Rain: 0%  💨 Wind: 3.2 km/h\n✅ Good conditions\n\nAll clear — enjoy your game! 🎾"
+  },
+  {
     "id": "1794148394815",
     "timestamp": "2026-11-08T14:33:14.815Z",
     "manual": false,
